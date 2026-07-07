@@ -50,6 +50,7 @@ export default function UrlForm({ onSubmit, loading }: UrlFormProps) {
           >
             URL//
           </span>
+
           <input
             value={value}
             onChange={(e) => setValue(e.target.value)}
@@ -68,33 +69,37 @@ export default function UrlForm({ onSubmit, loading }: UrlFormProps) {
           />
         </div>
 
-        <motion.button
-          type="submit"
-          disabled={loading}
-          whileHover={loading ? {} : { y: -2 }}
-          className="hard-border hard-shadow press"
-          style={{
-            background: loading ? "var(--color-mustard)" : "var(--color-lime)",
-            padding: "0 1.75rem",
-            fontFamily: "var(--font-display)",
-            fontWeight: 700,
-            fontSize: "1.05rem",
-            display: "flex",
-            alignItems: "center",
-            gap: "0.5rem",
-            minWidth: "140px",
-            justifyContent: "center",
-            opacity: loading ? 0.85 : 1,
-          }}
-        >
-          {loading ? (
-            <>
-              <ParseSpinner /> PARSING
-            </>
-          ) : (
-            <>SEARCH ▶</>
-          )}
-        </motion.button>
+        <div className="submit-wrapper">
+          <motion.button
+            type="submit"
+            disabled={loading}
+            whileHover={loading ? {} : { y: -2 }}
+            className="hard-border hard-shadow press"
+            style={{
+              background: loading
+                ? "var(--color-mustard)"
+                : "var(--color-lime)",
+              fontFamily: "var(--font-display)",
+              fontWeight: 700,
+              fontSize: "1.05rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "0.5rem",
+              minWidth: "140px",
+              opacity: loading ? 0.85 : 1,
+            }}
+          >
+            {loading ? (
+              <>
+                <ParseSpinner />
+                PARSING
+              </>
+            ) : (
+              <>SEARCH ▶</>
+            )}
+          </motion.button>
+        </div>
       </div>
     </form>
   );
@@ -104,7 +109,11 @@ function ParseSpinner() {
   return (
     <motion.span
       animate={{ rotate: 360 }}
-      transition={{ repeat: Infinity, duration: 0.9, ease: "linear" }}
+      transition={{
+        repeat: Infinity,
+        duration: 0.9,
+        ease: "linear",
+      }}
       style={{
         display: "inline-block",
         width: "0.9rem",

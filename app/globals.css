@@ -107,3 +107,19 @@ button {
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
+
+.submit-wrapper {
+  display: flex;
+}
+
+@media (max-width: 640px) {
+  .submit-wrapper {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .submit-wrapper button {
+    padding: 0.5rem 0.75rem !important;
+    min-height: 40px;
+  }
+}
