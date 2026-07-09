@@ -1,45 +1,22 @@
 // ./lib/resolveLink.ts
-//
-// Resolver untuk link download yang dilapisi shortlink/ad-locker.
-//
-// Rantai yang umum ditemukan (contoh: Re:Zero S4 di Kusonime):
-//   s.id/XXXX                                  -> shortlink awal (biasanya auto-redirect)
-//     justpaste.it/{articleId}                 -> "halaman tabel" berisi banyak link
-//       per baris: resolusi + host + <a href="https://justpaste.it/redirect/{id}/{encoded}">
-//         decode(encoded)                      -> tpi.li/{alias} (shortlink ad-locker/shrinkearn)
-//           halaman shrinkearn punya <input name="token" value="{hash}{alias}{date}{base64}">
-//             base64 di ekor token             -> LINK FINAL (mis. acefile.co/..., dst)
-//
-// Kalau link yang masuk sudah berupa host langsung (Google Drive, Mega, Krakenfiles, dst),
-// fungsi ini langsung return tanpa fetch tambahan.
 
 import * as cheerio from "cheerio";
 
 export interface ResolveOptions {
-  /** Label resolusi dari Kusonime, mis. "1080P". Dipakai untuk mencocokkan baris di halaman justpaste.it. */
   resolution?: string;
-  /** Label host dari Kusonime, mis. "Google Drive". Dipakai untuk mencocokkan baris di halaman justpaste.it. */
   host?: string;
-  /** Batas jumlah hop untuk mencegah infinite loop. Default 5. */
   maxHops?: number;
-  /** Timeout per-hop dalam ms. Default 12000. */
   timeoutMs?: number;
 }
 
 export interface ResolveResult {
-  /** Link akhir terbaik yang berhasil didapat. */
   url: string;
-  /** true kalau berhasil sampai ke link final yang dikenali, false kalau mentok/fallback. */
   resolved: boolean;
-  /** Jejak hop untuk debugging. */
   hops: string[];
 }
 
-const UA =
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36";
+const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36";
 
-// Domain-domain host file yang dianggap "final" — kalau link sudah mengarah ke sini,
-// tidak perlu di-resolve lebih lanjut.
 const DIRECT_HOST_PATTERNS: RegExp[] = [
   /acefile\.co/i,
   /drive\.google\.com/i,
@@ -85,10 +62,6 @@ function cleanText(text: string): string {
   return text.replace(/\s+/g, " ").trim();
 }
 
-/**
- * Parse halaman justpaste.it bertipe "tabel banyak link" menjadi:
- *   { "1080P": { "Google Drive": "https://justpaste.it/redirect/...", ... }, ... }
- */
 function parseJustpasteTable(html: string): Record<string, Record<string, string>> {
   const $ = cheerio.load(html);
   const container = $("#articleContent");
@@ -121,7 +94,6 @@ function parseJustpasteTable(html: string): Record<string, Record<string, string
   return result;
 }
 
-/** Cari link di tabel justpaste berdasarkan resolusi+host (case-insensitive), dengan fallback ke entri pertama. */
 function pickFromTable(
   table: Record<string, Record<string, string>>,
   resolution?: string,
@@ -140,7 +112,6 @@ function pickFromTable(
     if (firstHost) return firstHost;
   }
 
-  // fallback: entri pertama yang ada, apa pun resolusinya
   for (const hosts of Object.values(table)) {
     const first = Object.values(hosts)[0];
     if (first) return first;
@@ -148,7 +119,6 @@ function pickFromTable(
   return null;
 }
 
-/** Bongkar "https://justpaste.it/redirect/{id}/{encoded}" -> URL target asli. */
 function unwrapJustpasteRedirect(href: string): string {
   const match = href.match(/\/redirect\/[^/]+\/(.+)$/);
   if (match) {
@@ -161,7 +131,6 @@ function unwrapJustpasteRedirect(href: string): string {
   return href;
 }
 
-/** Ekstrak & decode token dari halaman ad-locker (tpi.li / shrinkearn dan sejenisnya). */
 function extractShrinkearnToken(html: string, alias: string): string | null {
   const $ = cheerio.load(html);
   const tokenVal = $('input[name="token"]').attr("value");
@@ -170,13 +139,12 @@ function extractShrinkearnToken(html: string, alias: string): string | null {
   const idx = tokenVal.indexOf(alias);
   if (idx === -1) return null;
 
-  // format token: {hash-hex}{alias}{tanggal 4 digit}{base64(final_url)}
   const b64 = tokenVal.slice(idx + alias.length + 4);
   try {
     const decoded = Buffer.from(b64, "base64").toString("utf-8");
     if (/^https?:\/\//i.test(decoded)) return decoded;
   } catch {
-    // ignore, fall through
+    // ignore
   }
   return null;
 }
@@ -191,11 +159,6 @@ function lastPathSegment(url: string): string {
   }
 }
 
-/**
- * Resolve sebuah link download (yang mungkin masih dilapisi shortlink/ad-locker)
- * menjadi link final. Aman dipanggil dengan link yang sudah final — akan langsung
- * dikembalikan tanpa fetch tambahan.
- */
 export async function resolveDownloadLink(
   startUrl: string,
   opts: ResolveOptions = {}
@@ -221,7 +184,6 @@ export async function resolveDownloadLink(
       return { url: finalUrl, resolved: true, hops };
     }
 
-    // Lapis 1: halaman justpaste.it berisi tabel resolusi/host
     if (/justpaste\.it/i.test(finalUrl) && html.includes("articleContent")) {
       const table = parseJustpasteTable(html);
       const picked = pickFromTable(table, opts.resolution, opts.host);
@@ -237,7 +199,6 @@ export async function resolveDownloadLink(
       continue;
     }
 
-    // Lapis 2: halaman ad-locker (tpi.li / shrinkearn / sejenisnya) dengan hidden input token
     if (html.includes('name="token"')) {
       const alias = lastPathSegment(current) || lastPathSegment(finalUrl);
       const decoded = extractShrinkearnToken(html, alias);
@@ -248,7 +209,6 @@ export async function resolveDownloadLink(
       break;
     }
 
-    // Bentuk halaman tidak dikenali — berhenti, kembalikan hop terakhir yang diketahui.
     break;
   }
 

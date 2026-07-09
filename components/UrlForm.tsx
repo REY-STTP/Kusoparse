@@ -13,7 +13,6 @@ export default function UrlForm({ onSubmit, loading }: UrlFormProps) {
   const [value, setValue] = useState("");
   const [isValid, setIsValid] = useState(false);
 
-  // Regex ketat untuk memastikan hanya URL Kusonime
   useEffect(() => {
     const kusonimeRegex = /^https?:\/\/(www\.)?kusonime\.com\/[a-zA-Z0-9-]+\/?$/;
     setIsValid(kusonimeRegex.test(value.trim()));
@@ -27,10 +26,9 @@ export default function UrlForm({ onSubmit, loading }: UrlFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
-      {/* Container Input & Tombol */}
+    
       <div className="flex flex-col sm:flex-row gap-4 sm:items-stretch">
         
-        {/* Kolom Input */}
         <div className="hard-border flex-1 bg-kuso-paper flex items-center px-4 py-2 sm:py-0 relative focus-within:ring-4 focus-within:ring-kuso-tape transition-shadow">
           <span className="font-mono text-xs font-bold text-kuso-ink/50 mr-3 select-none">
             URL//
@@ -44,12 +42,10 @@ export default function UrlForm({ onSubmit, loading }: UrlFormProps) {
           />
         </div>
 
-        {/* Tombol Search */}
         <motion.button
           type="submit"
           disabled={loading || (!isValid && value.length > 0)}
           
-          /* Animasi Hover & Klik kustom via Framer Motion */
           whileHover={(!loading && isValid || value.length === 0) ? { y: -2, x: -2, boxShadow: "8px 8px 0px 0px #14121f" } : {}}
           whileTap={(!loading && isValid || value.length === 0) ? { y: 4, x: 4, boxShadow: "0px 0px 0px 0px #14121f" } : {}}
           
@@ -75,7 +71,6 @@ export default function UrlForm({ onSubmit, loading }: UrlFormProps) {
         </motion.button>
       </div>
 
-      {/* Pesan error validasi instan */}
       <div className="h-6 mt-2">
         {value.length > 0 && !isValid && (
           <motion.p 

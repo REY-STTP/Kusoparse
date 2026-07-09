@@ -61,11 +61,9 @@ export default function AnimeCard({ data }: { data: ParsedAnime }) {
       transition={{ type: "spring", stiffness: 220, damping: 20 }}
       className="hard-border shadow-hard bg-kuso-paper relative w-full max-w-2xl mx-auto p-5 sm:p-7 z-10"
     >
-      
-      {/* Perforation strip */}
+
       <div className="absolute top-0 -left-1 -right-1 h-0 border-t-[3px] border-dashed border-kuso-ink/35 translate-y-4" aria-hidden />
 
-      {/* Stamp */}
       <div className={`absolute -top-4 -right-2 sm:right-4 rotate-6 ${stamp.color} hard-border px-3 py-1 font-display font-bold text-sm shadow-hard-sm`}>
         {stamp.label}
       </div>

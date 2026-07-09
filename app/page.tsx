@@ -2,8 +2,8 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { AlertOctagon } from "lucide-react";
-import UrlForm from "@/components/features/UrlForm";
-import AnimeCard from "@/components/features/AnimeCard";
+import UrlForm from "@/components/UrlForm";
+import AnimeCard from "@/components/AnimeCard";
 import { useKuso } from "@/hooks/useKuso";
 
 const TITLE = "PASTE. PARSE. DOWNLOAD.";
