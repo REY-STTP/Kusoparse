@@ -1,123 +1,44 @@
-// ./app/page.tsx
-
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
-import UrlForm from "@/components/UrlForm";
-import AnimeCard from "@/components/AnimeCard";
-import type { ParsedAnime } from "@/lib/parseKusonime";
+import { motion, AnimatePresence } from "framer-motion";
+import { AlertOctagon } from "lucide-react";
+import UrlForm from "@/components/features/UrlForm";
+import AnimeCard from "@/components/features/AnimeCard";
+import { useKuso } from "@/hooks/useKuso";
 
 const TITLE = "PASTE. PARSE. DOWNLOAD.";
 
-const container = {
-  hidden: {},
-  show: {
-    transition: {
-      staggerChildren: 0.035,
-    },
-  },
-};
-
-const letter = {
-  hidden: {
-    opacity: 0,
-    y: 24,
-    rotate: -6,
-  },
-  show: {
-    opacity: 1,
-    y: 0,
-    rotate: 0,
-  },
-};
-
 export default function Home() {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<ParsedAnime | null>(null);
+  const { parseUrl, loading, error, data } = useKuso();
 
-  async function handleSubmit(url: string) {
-    setLoading(true);
-    setError(null);
-    setData(null);
+  const containerVars = {
+    hidden: {},
+    show: { transition: { staggerChildren: 0.04 } },
+  };
 
-    try {
-      const res = await fetch(`/api/parse?url=${encodeURIComponent(url)}`);
-      const json = await res.json();
-
-      if (!res.ok) {
-        setError(json.error ?? "Terjadi kesalahan.");
-        return;
-      }
-
-      setData(json.data);
-    } catch {
-      setError("Gagal menghubungi server. Coba lagi.");
-    } finally {
-      setLoading(false);
-    }
-  }
+  const letterVars = {
+    hidden: { opacity: 0, y: 20, rotate: -4 },
+    show: { opacity: 1, y: 0, rotate: 0 },
+  };
 
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        padding: "3.5rem 1.25rem 2rem",
-        position: "relative",
-        zIndex: 1,
-      }}
-    >
-      <div
-        style={{
-          flex: 1,
-          width: "100%",
-          maxWidth: "640px",
-          margin: "0 auto",
-        }}
-      >
-        <header
-          style={{
-            textAlign: "center",
-            marginBottom: "2.5rem",
-          }}
-        >
-          <div
-            className="mono-label hard-border"
-            style={{
-              display: "inline-block",
-              background: "var(--color-mustard)",
-              padding: "0.3rem 0.9rem",
-              marginBottom: "1.25rem",
-              boxShadow: "3px 3px 0 0 var(--color-ink)",
-              transform: "rotate(-2deg)",
-            }}
-          >
+    <main className="min-h-screen flex flex-col pt-14 pb-8 px-5 relative z-10">
+      <div className="flex-1 w-full max-w-2xl mx-auto">
+        <header className="text-center mb-10">
+          <div className="mono-label hard-border inline-block bg-kuso-mustard px-4 py-1 mb-5 shadow-hard-sm -rotate-2 font-mono text-xs font-bold uppercase">
             ● KUSOPARSE — KUSONIME PARSER
           </div>
 
           <motion.h1
-            variants={container}
+            variants={containerVars}
             initial="hidden"
             animate="show"
-            style={{
-              fontFamily: "var(--font-display)",
-              fontWeight: 700,
-              fontSize: "clamp(2.1rem, 7vw, 4rem)",
-              lineHeight: 1.05,
-              margin: 0,
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "center",
-              gap: "0 0.6rem",
-            }}
+            className="font-display font-bold text-4xl sm:text-5xl md:text-6xl leading-[1.05] flex flex-wrap justify-center gap-x-3"
           >
             {TITLE.split(" ").map((word, wi) => (
-              <span key={wi} style={{ display: "inline-flex" }}>
+              <span key={wi} className="inline-flex">
                 {word.split("").map((ch, ci) => (
-                  <motion.span key={ci} variants={letter}>
+                  <motion.span key={ci} variants={letterVars}>
                     {ch}
                   </motion.span>
                 ))}
@@ -129,84 +50,53 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.75 }}
             transition={{ delay: 0.5, duration: 0.4 }}
-            style={{
-              maxWidth: "480px",
-              margin: "1.25rem auto 0",
-              fontSize: "1rem",
-              lineHeight: 1.55,
-            }}
+            className="max-w-md mx-auto mt-5 text-sm sm:text-base leading-relaxed"
           >
-            Tempel URL Kusonime untuk mengambil metadata anime,
-            informasi episode, dan seluruh link download dalam satu
-            halaman.
+            Tempel URL Kusonime untuk mengambil metadata anime, informasi episode, dan seluruh link download tanpa popup iklan.
           </motion.p>
         </header>
 
-        <UrlForm
-          onSubmit={handleSubmit}
-          loading={loading}
-        />
+        <UrlForm onSubmit={parseUrl} loading={loading} />
 
-        <div
-          style={{
-            marginTop: "2.5rem",
-          }}
-        >
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, x: -6 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="hard-border"
-              style={{
-                background: "var(--color-pink)",
-                color: "var(--color-paper)",
-                padding: "1rem 1.25rem",
-                fontFamily: "var(--font-mono)",
-                fontSize: "0.88rem",
-                boxShadow: "5px 5px 0 0 var(--color-ink)",
-              }}
-            >
-              <strong
-                style={{
-                  display: "block",
-                  marginBottom: "0.2rem",
-                }}
+        <div className="mt-10 min-h-[300px]">
+          <AnimatePresence mode="wait">
+            {error && (
+              <motion.div
+                key="error"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="hard-border shadow-hard bg-kuso-pink text-kuso-paper p-4 font-mono text-sm flex items-start gap-3"
               >
-                ⚠ PARSE GAGAL
-              </strong>
+                <AlertOctagon className="w-6 h-6 shrink-0" />
+                <div>
+                  <strong className="block mb-1 text-base">⚠ PARSE GAGAL</strong>
+                  {error}
+                </div>
+              </motion.div>
+            )}
 
-              {error}
-            </motion.div>
-          )}
+            {data && !error && (
+              <AnimeCard key="anime-card" data={data} />
+            )}
 
-          {data && <AnimeCard data={data} />}
-
-          {!data && !error && !loading && (
-            <div
-              className="mono-label"
-              style={{
-                textAlign: "center",
-                opacity: 0.4,
-                maxWidth: "420px",
-                margin: "0 auto",
-              }}
-            >
-              SIAP UNTUK PARSE — TEMPEL URL KUSONIME DI ATAS
-            </div>
-          )}
+            {!data && !error && !loading && (
+              <motion.div
+                key="idle"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="font-mono text-center opacity-40 text-xs tracking-widest uppercase max-w-sm mx-auto mt-20"
+              >
+                SIAP UNTUK PARSE — TEMPEL URL KUSONIME DI ATAS
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
-      <footer
-        className="mono-label"
-        style={{
-          marginTop: "auto",
-          paddingTop: "2rem",
-          textAlign: "center",
-          opacity: 0.4,
-        }}
-      >
-        KUSOPARSE © {new Date().getFullYear()} — dibuat untuk para pemalas
+      <footer className="mt-auto pt-8 text-center font-mono text-xs opacity-40">
+        KUSOPARSE © {new Date().getFullYear()} — Dibuat untuk para pemalas.
       </footer>
     </main>
   );

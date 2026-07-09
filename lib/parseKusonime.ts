@@ -37,10 +37,10 @@ export function parseKusonime(html: string, sourceUrl: string): ParsedAnime {
     result.title = cleanText(titleTag.text());
   }
 
-  const thumb = $(".post-thumb img").first();
-  if (thumb.length) {
-    result.thumbnail = thumb.attr("src") ?? null;
-  }
+  const metaImage = $('meta[property="og:image"]').attr('content');
+  const fallbackImage = $(".post-thumb img").first().attr("src");
+  
+  result.thumbnail = metaImage || fallbackImage || null;
 
   $("div.info p").each((_, el) => {
     const text = cleanText($(el).text());
