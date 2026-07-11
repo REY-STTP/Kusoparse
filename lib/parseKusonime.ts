@@ -7,12 +7,17 @@ export interface DownloadLink {
   url: string;
 }
 
+export interface DownloadGroup {
+  title: string;
+  downloads: Record<string, DownloadLink[]>;
+}
+
 export interface ParsedAnime {
   title: string | null;
   thumbnail: string | null;
   info: Record<string, string>;
   synopsis: string | null;
-  downloads: Record<string, DownloadLink[]>;
+  downloads: DownloadGroup[];
   sourceUrl: string;
 }
 
@@ -28,7 +33,7 @@ export function parseKusonime(html: string, sourceUrl: string): ParsedAnime {
     thumbnail: null,
     info: {},
     synopsis: null,
-    downloads: {},
+    downloads: [],
     sourceUrl,
   };
 
@@ -67,19 +72,49 @@ export function parseKusonime(html: string, sourceUrl: string): ParsedAnime {
     result.synopsis = parts.join("\n\n") || null;
   }
 
-  $("div.smokeurlrh").each((_, row) => {
-    const strong = $(row).find("strong").first();
-    if (!strong.length) return;
-    const resolution = cleanText(strong.text());
-    const links: DownloadLink[] = [];
-    $(row)
-      .find("a")
-      .each((_, a) => {
-        const href = $(a).attr("href");
-        const label = cleanText($(a).text());
-        if (href) links.push({ host: label, url: href });
+  $("div.smokeddlrh").each((_, group) => {
+    const title = cleanText(
+      $(group).find(".smokettlrh").first().text()
+    );
+
+    const downloads: Record<string, DownloadLink[]> = {};
+
+    $(group)
+      .find(".smokeurlrh")
+      .each((_, row) => {
+        const resolution = cleanText(
+          $(row).find("strong").first().text()
+        );
+
+        if (!resolution) return;
+
+        const links: DownloadLink[] = [];
+
+        $(row)
+          .find("a")
+          .each((_, a) => {
+            const href = $(a).attr("href");
+            const host = cleanText($(a).text());
+
+            if (href) {
+              links.push({
+                host,
+                url: href,
+              });
+            }
+          });
+
+        if (links.length) {
+          downloads[resolution] = links;
+        }
       });
-    if (links.length) result.downloads[resolution] = links;
+
+    if (Object.keys(downloads).length) {
+      result.downloads.push({
+        title,
+        downloads,
+      });
+    }
   });
 
   return result;

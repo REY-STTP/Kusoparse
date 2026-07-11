@@ -23,7 +23,7 @@ const jbMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "KUSOPARSE — Parse Kusonime dengan Mudah",
+  title: "KUSOPARSE",
   description: "Tempel URL Kusonime, KUSOPARSE akan mengambil metadata dan link download dalam satu klik."
 };
 

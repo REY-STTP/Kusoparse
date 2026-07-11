@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp, ExternalLink, Loader2 } from "lucide-react";
 import type { ParsedAnime } from "@/lib/parseKusonime";
@@ -27,11 +27,29 @@ export default function AnimeCard({ data }: { data: ParsedAnime }) {
   const stamp = getStamp(data.info);
   const [showFullSynopsis, setShowFullSynopsis] = useState(false);
   
-  const resolutions = Object.keys(data.downloads);
-  const [openRes, setOpenRes] = useState<string | null>(resolutions[0] ?? null);
+  const [openGroup, setOpenGroup] = useState(0);
+
+  const currentGroup = data.downloads[openGroup];
+  const resolutions = currentGroup ? Object.keys(currentGroup.downloads) : [];
+
+  const [openRes, setOpenRes] = useState<string | null>(
+    resolutions[0] ?? null
+  );
   
   const [isResolving, setIsResolving] = useState(false);
   const [activeHost, setActiveHost] = useState<string | null>(null);
+
+  useEffect(() => {
+    setOpenGroup(0);
+
+    const firstGroup = data.downloads[0];
+
+    setOpenRes(
+      firstGroup
+        ? Object.keys(firstGroup.downloads)[0] ?? null
+        : null
+    );
+  }, [data]);
 
   async function handleDownloadClick(resolution: string, host: string, url: string) {
     if (isResolving) return;
@@ -122,6 +140,39 @@ export default function AnimeCard({ data }: { data: ParsedAnime }) {
         </div>
       )}
 
+      {data.downloads.length > 1 && (
+        <div className="mb-5">
+          <div className="font-mono text-xs opacity-50 mb-2 uppercase tracking-wider">
+            PILIH PART //
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {data.downloads.map((group, index) => {
+              const active = openGroup === index;
+
+              return (
+                <button
+                  key={index}
+                  onClick={() => {
+                    setOpenGroup(index);
+
+                    const firstRes = Object.keys(group.downloads)[0] ?? null;
+                    setOpenRes(firstRes);
+                  }}
+                  className={`hard-border press-effect px-4 py-2 font-mono text-sm font-bold ${
+                    active
+                      ? "bg-kuso-pink text-white"
+                      : "bg-kuso-paper shadow-hard-sm"
+                  }`}
+                >
+                  {group.title}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       <div className="font-mono text-xs opacity-50 mb-3 uppercase tracking-wider">
         PILIH KUALITAS //
       </div>
@@ -144,7 +195,7 @@ export default function AnimeCard({ data }: { data: ParsedAnime }) {
       </div>
 
       <AnimatePresence mode="wait">
-        {openRes && data.downloads[openRes] && (
+        {openRes && currentGroup?.downloads[openRes] && (
           <motion.div
             key={openRes}
             initial={{ opacity: 0, height: 0 }}
@@ -154,7 +205,7 @@ export default function AnimeCard({ data }: { data: ParsedAnime }) {
             className="overflow-hidden"
           >
             <div className="pt-2 flex flex-wrap gap-2">
-              {data.downloads[openRes].map((link, i) => {
+              {currentGroup.downloads[openRes].map((link, i) => {
                 const isActiveResolving = activeHost === link.host && isResolving;
                 return (
                   <button
