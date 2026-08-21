@@ -2,15 +2,19 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { parseKusonime, isLikelyParsed } from "@/lib/parseKusonime";
+import { dictionaries, isLocale } from "@/lib/i18n/dictionaries";
 
 export const runtime = "nodejs";
 
 export async function GET(req: NextRequest) {
+  const langParam = req.nextUrl.searchParams.get("lang");
+  const t = dictionaries[isLocale(langParam) ? langParam : "id"];
+
   const url = req.nextUrl.searchParams.get("url");
 
   if (!url) {
     return NextResponse.json(
-      { error: "URL wajib diisi." },
+      { error: t.errors.urlRequired },
       { status: 400 }
     );
   }
@@ -19,11 +23,11 @@ export async function GET(req: NextRequest) {
   try {
     parsedUrl = new URL(url);
     if (!["http:", "https:"].includes(parsedUrl.protocol)) {
-      throw new Error("Protokol tidak didukung.");
+      throw new Error("Unsupported protocol.");
     }
   } catch {
     return NextResponse.json(
-      { error: "URL tidak valid." },
+      { error: t.errors.urlInvalid },
       { status: 400 }
     );
   }
@@ -44,7 +48,7 @@ export async function GET(req: NextRequest) {
 
     if (!res.ok) {
       return NextResponse.json(
-        { error: `Situs tujuan membalas dengan status ${res.status}.` },
+        { error: t.errors.upstreamStatus(res.status) },
         { status: 502 }
       );
     }
@@ -54,10 +58,7 @@ export async function GET(req: NextRequest) {
 
     if (!isLikelyParsed(data)) {
       return NextResponse.json(
-        {
-          error:
-            "Halaman berhasil diambil, tetapi strukturnya tidak dikenali. KUSOPARSE hanya mendukung halaman Kusonime.",
-        },
+        { error: t.errors.unrecognized },
         { status: 422 }
       );
     }
@@ -66,8 +67,8 @@ export async function GET(req: NextRequest) {
   } catch (err) {
     const message =
       err instanceof Error && err.name === "AbortError"
-        ? "Situs tujuan tidak merespons (timeout)."
-        : "Gagal mengambil halaman. Coba lagi atau periksa URL-nya.";
+        ? t.errors.timeout
+        : t.errors.fetchFailed;
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

@@ -1,7 +1,9 @@
 import { useState } from "react";
 import type { ParsedAnime } from "@/lib/parseKusonime";
+import { useLocale } from "@/lib/i18n/LocaleContext";
 
 export function useKuso() {
+  const { locale, t } = useLocale();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<ParsedAnime | null>(null);
@@ -12,13 +14,15 @@ export function useKuso() {
     setData(null);
 
     try {
-      const res = await fetch(`/api/parse?url=${encodeURIComponent(url)}`);
+      const res = await fetch(
+        `/api/parse?url=${encodeURIComponent(url)}&lang=${locale}`
+      );
       const json = await res.json();
 
-      if (!res.ok) throw new Error(json.error ?? "Terjadi kesalahan pada server.");
+      if (!res.ok) throw new Error(json.error ?? t.errors.fetchFailed);
       setData(json.data);
     } catch (err: any) {
-      setError(err.message || "Gagal menghubungi server. Coba lagi.");
+      setError(err.message || t.errors.network);
     } finally {
       setLoading(false);
     }

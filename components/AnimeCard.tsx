@@ -4,19 +4,21 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp, ExternalLink, Loader2 } from "lucide-react";
 import type { ParsedAnime } from "@/lib/parseKusonime";
+import { useLocale } from "@/lib/i18n/LocaleContext";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
 
-const STATUS_STAMP: Record<string, { label: string; color: string }> = {
-  ongoing: { label: "ONGOING", color: "bg-kuso-pink" },
-  completed: { label: "TAMAT", color: "bg-kuso-blue text-white" },
-  finished: { label: "TAMAT", color: "bg-kuso-blue text-white" },
-};
-
-function getStamp(info: Record<string, string>) {
+function getStamp(info: Record<string, string>, t: Dictionary) {
   const status = (info["Status"] ?? "").toLowerCase();
-  for (const key of Object.keys(STATUS_STAMP)) {
-    if (status.includes(key)) return STATUS_STAMP[key];
+  if (status.includes("ongoing")) {
+    return { label: t.card.stampOngoing, color: "bg-kuso-accent text-kuso-paper" };
   }
-  return { label: status ? status.toUpperCase() : "ARSIP", color: "bg-kuso-mustard" };
+  if (status.includes("completed") || status.includes("finished")) {
+    return { label: t.card.stampCompleted, color: "bg-kuso-ink text-kuso-paper" };
+  }
+  return {
+    label: status ? status.toUpperCase() : t.card.stampArchive,
+    color: "bg-kuso-tape text-kuso-ink",
+  };
 }
 
 const INFO_ORDER = [
@@ -24,9 +26,10 @@ const INFO_ORDER = [
 ];
 
 export default function AnimeCard({ data }: { data: ParsedAnime }) {
-  const stamp = getStamp(data.info);
+  const { t } = useLocale();
+  const stamp = getStamp(data.info, t);
   const [showFullSynopsis, setShowFullSynopsis] = useState(false);
-  
+
   const [openGroup, setOpenGroup] = useState(0);
 
   const currentGroup = data.downloads[openGroup];
@@ -35,7 +38,7 @@ export default function AnimeCard({ data }: { data: ParsedAnime }) {
   const [openRes, setOpenRes] = useState<string | null>(
     resolutions[0] ?? null
   );
-  
+
   const [isResolving, setIsResolving] = useState(false);
   const [activeHost, setActiveHost] = useState<string | null>(null);
 
@@ -86,22 +89,22 @@ export default function AnimeCard({ data }: { data: ParsedAnime }) {
         {stamp.label}
       </div>
 
-      <div className="font-mono text-xs opacity-50 mb-2 uppercase tracking-wider">
-        ANIME DITEMUKAN //
+      <div className="font-mono text-xs opacity-50 mb-2 lowercase italic tracking-wider">
+        {t.card.found}
       </div>
 
       {data.thumbnail && (
         <div className="mb-6 w-full relative">
-          <img 
-            src={data.thumbnail} 
-            alt={data.title || "Thumbnail"} 
+          <img
+            src={data.thumbnail}
+            alt={data.title ? t.card.coverAlt(data.title) : t.card.coverAltFallback}
             className="w-full h-auto object-cover hard-border shadow-hard max-h-[350px] bg-kuso-tape"
             loading="lazy"
           />
         </div>
       )}
 
-      <h2 className="font-display font-bold text-2xl sm:text-3xl leading-tight mb-4">
+      <h2 className="font-display font-black text-2xl sm:text-3xl leading-tight tracking-[-0.01em] text-balance mb-4">
         {data.title}
       </h2>
 
@@ -110,12 +113,12 @@ export default function AnimeCard({ data }: { data: ParsedAnime }) {
           {orderedInfo.map(([key, value]) => (
             <div key={key}>
               <div className="opacity-60 text-[10px] sm:text-xs uppercase font-bold tracking-wider">{key}</div>
-              <div className="font-semibold mt-0.5 line-clamp-2" title={value}>{value}</div>
+              <div className="font-semibold mt-0.5 line-clamp-2 tabular-nums" title={value}>{value}</div>
             </div>
           ))}
         </div>
       )}
-      
+
       {data.synopsis && (
         <div className="mb-7">
           {(showFullSynopsis || data.synopsis.length <= 320
@@ -124,7 +127,7 @@ export default function AnimeCard({ data }: { data: ParsedAnime }) {
             .split(/\n+/)
             .filter((p) => p.trim() !== "")
             .map((paragraph, index) => (
-              <p key={index} className="text-sm sm:text-base leading-relaxed opacity-90 text-justify mb-2">
+              <p key={index} className="text-sm sm:text-base leading-relaxed opacity-90 text-left text-pretty max-w-[65ch] mb-2">
                 {paragraph}
               </p>
             ))}
@@ -132,9 +135,9 @@ export default function AnimeCard({ data }: { data: ParsedAnime }) {
           {data.synopsis.length > 320 && (
             <button
               onClick={() => setShowFullSynopsis((v) => !v)}
-              className="hard-border press-effect bg-kuso-paper px-3 py-1.5 font-mono text-xs font-bold shadow-hard-sm mt-2 flex items-center gap-1"
+              className="hard-border press-effect lift-hover bg-kuso-paper px-3 py-1.5 font-mono text-xs font-bold shadow-hard-sm mt-2 inline-flex items-center gap-1.5 hover:bg-kuso-tape"
             >
-              {showFullSynopsis ? <><ChevronUp className="w-4 h-4"/> TUTUP</> : <><ChevronDown className="w-4 h-4"/> BACA SELENGKAPNYA</>}
+              {showFullSynopsis ? <><ChevronUp className="w-4 h-4"/> {t.card.collapse}</> : <><ChevronDown className="w-4 h-4"/> {t.card.readMore}</>}
             </button>
           )}
         </div>
@@ -142,8 +145,8 @@ export default function AnimeCard({ data }: { data: ParsedAnime }) {
 
       {data.downloads.length > 1 && (
         <div className="mb-5">
-          <div className="font-mono text-xs opacity-50 mb-2 uppercase tracking-wider">
-            PILIH PART //
+          <div className="font-mono text-xs opacity-50 mb-2 lowercase italic tracking-wider">
+            {t.card.pickPart}
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -161,8 +164,8 @@ export default function AnimeCard({ data }: { data: ParsedAnime }) {
                   }}
                   className={`hard-border press-effect px-4 py-2 font-mono text-sm font-bold ${
                     active
-                      ? "bg-kuso-pink text-white"
-                      : "bg-kuso-paper shadow-hard-sm"
+                      ? "bg-kuso-ink text-kuso-paper"
+                      : "bg-kuso-paper shadow-hard-sm hover:bg-kuso-tape"
                   }`}
                 >
                   {group.title}
@@ -173,8 +176,8 @@ export default function AnimeCard({ data }: { data: ParsedAnime }) {
         </div>
       )}
 
-      <div className="font-mono text-xs opacity-50 mb-3 uppercase tracking-wider">
-        PILIH KUALITAS //
+      <div className="font-mono text-xs opacity-50 mb-3 lowercase italic tracking-wider">
+        {t.card.pickQuality}
       </div>
 
       <div className="flex flex-wrap gap-2 mb-4">
@@ -185,7 +188,7 @@ export default function AnimeCard({ data }: { data: ParsedAnime }) {
               key={res}
               onClick={() => setOpenRes(active ? null : res)}
               className={`hard-border press-effect px-4 py-2 font-mono font-bold text-sm
-                ${active ? "bg-kuso-lime translate-x-1 translate-y-1 shadow-none" : "bg-kuso-paper shadow-hard-sm"}
+                ${active ? "bg-kuso-accent text-kuso-paper translate-x-1 translate-y-1 shadow-none" : "bg-kuso-paper shadow-hard-sm hover:bg-kuso-tape"}
               `}
             >
               {res}
@@ -213,12 +216,12 @@ export default function AnimeCard({ data }: { data: ParsedAnime }) {
                     onClick={() => handleDownloadClick(openRes!, link.host, link.url)}
                     disabled={isResolving}
                     className={`hard-border press-effect flex items-center gap-2 px-3 py-2 font-mono text-xs font-bold shadow-hard-sm
-                      ${isActiveResolving ? "bg-kuso-mustard text-kuso-ink cursor-wait" : "bg-kuso-blue text-kuso-paper hover:bg-kuso-blue/90"}
+                      ${isActiveResolving ? "bg-kuso-tape text-kuso-ink cursor-wait" : "bg-kuso-ink text-kuso-paper hover:bg-kuso-accent"}
                       ${isResolving && !isActiveResolving ? "opacity-50 cursor-not-allowed" : ""}
                     `}
                   >
                     {isActiveResolving ? (
-                      <><Loader2 className="w-4 h-4 animate-spin"/> MEMBUKA…</>
+                      <><Loader2 className="w-4 h-4 animate-spin"/> {t.card.opening}</>
                     ) : (
                       <>{link.host} <ExternalLink className="w-3 h-3" /></>
                     )}

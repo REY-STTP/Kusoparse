@@ -1,30 +1,38 @@
 // ./app/layout.tsx
 
-import type { Metadata } from "next";
-import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Zen_Kaku_Gothic_New, JetBrains_Mono } from "next/font/google";
+import { LocaleProvider } from "@/lib/i18n/LocaleContext";
+import SkipLink from "@/components/SkipLink";
 import "./globals.css";
 
-const spaceGrotesk = Space_Grotesk({
+const zenKaku = Zen_Kaku_Gothic_New({
   subsets: ["latin"],
-  weight: ["500", "700"],
-  variable: "--font-space-grotesk",
-});
-
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-inter",
+  weight: ["400", "500", "700", "900"],
+  variable: "--font-zenkaku",
 });
 
 const jbMono = JetBrains_Mono({
   subsets: ["latin"],
-  weight: ["400", "600"],
+  weight: ["400", "700"],
   variable: "--font-jbmono",
 });
 
 export const metadata: Metadata = {
-  title: "KUSOPARSE",
-  description: "Tempel URL Kusonime, KUSOPARSE akan mengambil metadata dan link download dalam satu klik."
+  title: "KUSOPARSE — Kusonime Link Parser",
+  description:
+    "Tempel URL Kusonime, KUSOPARSE mengambil metadata anime dan seluruh link download dalam satu klik. Tanpa popup, tanpa shortlink.",
+  openGraph: {
+    title: "KUSOPARSE — Kusonime Link Parser",
+    description:
+      "Tempel URL Kusonime, dapatkan metadata anime dan seluruh link download dalam satu klik. Tanpa popup, tanpa shortlink.",
+    type: "website",
+    locale: "id_ID",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#f2ecdc",
 };
 
 export default function RootLayout({
@@ -34,10 +42,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id">
-      <body
-        className={`${spaceGrotesk.variable} ${inter.variable} ${jbMono.variable}`}
-      >
-        {children}
+      <body className={`${zenKaku.variable} ${jbMono.variable}`}>
+        <LocaleProvider>
+          <SkipLink />
+          {children}
+        </LocaleProvider>
       </body>
     </html>
   );

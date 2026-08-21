@@ -1,32 +1,64 @@
-# 🎌 KUSOPARSE
+# KUSOPARSE
 
-<div align="center">
-  <img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js" />
-  <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
-  <img src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel" />
-</div>
+Parser untuk halaman [Kusonime](https://kusonime.com): tempel URL artikel anime, dapatkan metadata, informasi episode, dan seluruh link download dalam satu klik — tanpa popup iklan, tanpa shortlink.
 
-<br />
+Dibangun dengan Next.js App Router, bergaya risograph print / neo-brutalist, dan mendukung tiga bahasa.
 
-> **Parse Kusonime pages into a clean, modern, ad-free download interface.**
+## Fitur
 
-KUSOPARSE adalah *lightweight web application* bergaya **Neubrutalism** yang berfungsi mengekstrak metadata anime dan mem-bypass *shortlink/ad-lockers* dari halaman Kusonime. Tempel URL, dan dapatkan *direct link* resolusimu dalam satu klik.
+- **Parsing instan** — ekstrak judul, thumbnail, info (genre, status, score, dst.), sinopsis, dan semua link download dari halaman Kusonime.
+- **Resolve shortlink** — membuka shortlink host (shrinkearn, tpi.li, justpaste.it, dst.) langsung ke link download aslinya.
+- **Multibahasa** — UI dalam Bahasa Indonesia, English, dan 日本語. Deteksi otomatis dari bahasa browser, pilihan tersimpan di `localStorage`. Error API juga terjemahan (`/api/parse?lang=…`).
+- **Validasi URL** — hanya menerima URL artikel Kusonime yang valid.
+- **State lengkap** — skeleton loader saat parsing, error state yang jelas, empty state "cara pakai", halaman 404 kustom.
+- **Aksesibilitas** — skip-link, `focus-visible`, `aria` attributes, dukungan `prefers-reduced-motion`.
 
-## ✨ Fitur Utama
+## Tech Stack
 
-- **🚀 Instant Parsing:** Ambil data Kusonime tanpa perlu membuka web aslinya.
-- **🛡️ Ad-Locker Bypass:** Otomatis me-resolve link shrinkearn, tpi.li, dan justpaste.it.
-- **📱 Fully Responsive:** Dibangun dengan Tailwind CSS, sempurna di layar HP maupun Desktop.
-- **🎨 Neubrutalism UI:** Desain unik bergaya retro/brutalist dengan animasi mulus dari Framer Motion.
-- **🔍 Validasi Ketat:** Memastikan hanya URL Kusonime yang valid yang dieksekusi.
+| Lapisan | Teknologi |
+| --- | --- |
+| Framework | Next.js 16 (App Router, Turbopack) |
+| Bahasa | TypeScript |
+| UI | Tailwind CSS 3, Framer Motion, lucide-react |
+| Parsing | cheerio |
 
-## 🛠️ Instalasi & Pengembangan
-
-Kloning repositori dan jalankan di mesin lokalku:
+## Menjalankan
 
 ```bash
-git clone [https://github.com/REY-STTP/kusoparse.git](https://github.com/REY-STTP/kusoparse.git)
-cd kusoparse
 npm install
-npm run dev
+npm run dev      # http://localhost:3000
+npm run build    # production build
+npm run start    # jalankan build produksi
+```
+
+## Struktur
+
+```
+app/
+  page.tsx              # Halaman utama
+  layout.tsx            # Font, metadata, LocaleProvider
+  not-found.tsx         # 404 kustom
+  api/parse/route.ts    # Endpoint parsing (lang-aware)
+  api/resolve/route.ts  # Endpoint resolve shortlink
+components/
+  UrlForm.tsx           # Form input URL + validasi
+  AnimeCard.tsx         # Kartu hasil (info, sinopsis, link)
+  LocaleSwitcher.tsx    # Toggle ID / EN / JP
+  SkipLink.tsx          # Skip-to-content link
+lib/
+  parseKusonime.ts      # Scraper cheerio halaman Kusonime
+  resolveLink.ts        # Resolver shortlink
+  i18n/                 # dictionaries.ts + LocaleContext.tsx
+hooks/
+  useKuso.ts            # State parsing (loading / error / data)
+```
+
+## Identitas Visual
+
+- Palet: cream `#F2ECDC`, paper `#FCFAF2`, sand `#E7DDC6`, ink `#171410`, aksen vermilion `#D63F1E` — lihat `tailwind.config.ts`.
+- Tipografi: Zen Kaku Gothic New (display & body), JetBrains Mono.
+- Logo: monogram "K" yang menyatu dengan panah download, tersedia di `app/icon.png` (512), `app/apple-icon.png` (180), dan `public/favicon.ico` (32).
+
+## Disclaimer
+
+KUSOPARSE bukan afiliasi resmi Kusonime. Seluruh konten yang diproses tetap milik pemilik aslinya. Gunakan untuk keperluan yang diperbolehkan.
