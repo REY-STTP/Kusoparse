@@ -12,7 +12,6 @@ import {
 } from "react";
 import {
   dictionaries,
-  isLocale,
   type Dictionary,
   type Locale,
 } from "./dictionaries";
@@ -31,27 +30,17 @@ const LocaleContext = createContext<LocaleContextValue>({
   t: dictionaries.id,
 });
 
-function detectLocale(): Locale {
-  if (typeof window === "undefined") return "id";
-
-  const stored = window.localStorage.getItem(STORAGE_KEY);
-  if (isLocale(stored)) return stored;
-
-  const nav = window.navigator.language.toLowerCase();
-  if (nav.startsWith("ja")) return "ja";
-  if (nav.startsWith("en")) return "en";
-  return "id";
-}
-
-export function LocaleProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>("id");
+export function LocaleProvider({
+  children,
+  initialLocale = "id",
+}: {
+  children: ReactNode;
+  initialLocale?: Locale;
+}) {
+  const [locale, setLocaleState] = useState<Locale>(initialLocale);
 
   useEffect(() => {
-    setLocaleState(detectLocale());
-  }, []);
-
-  useEffect(() => {
-    document.documentElement.lang = locale;
+    document.documentElement.lang = locale === "id" ? "id-ID" : locale;
   }, [locale]);
 
   const setLocale = useCallback((next: Locale) => {

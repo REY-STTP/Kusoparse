@@ -1,6 +1,7 @@
 // ./lib/parseKusonime.ts
 
 import * as cheerio from "cheerio";
+import { normalizeHttpUrl } from "@/lib/urls";
 
 export interface DownloadLink {
   host: string;
@@ -42,10 +43,14 @@ export function parseKusonime(html: string, sourceUrl: string): ParsedAnime {
     result.title = cleanText(titleTag.text());
   }
 
-  const metaImage = $('meta[property="og:image"]').attr('content');
-  const fallbackImage = $(".post-thumb img").first().attr("src");
-  
-  result.thumbnail = metaImage || fallbackImage || null;
+  const imageCandidates = [
+    $('meta[property="og:image"]').attr("content"),
+    $(".post-thumb img").first().attr("src"),
+  ];
+  result.thumbnail =
+    imageCandidates
+      .map((value) => normalizeHttpUrl(value, sourceUrl))
+      .find((value): value is string => value !== null) ?? null;
 
   $("div.info p").each((_, el) => {
     const text = cleanText($(el).text());
@@ -96,10 +101,11 @@ export function parseKusonime(html: string, sourceUrl: string): ParsedAnime {
             const href = $(a).attr("href");
             const host = cleanText($(a).text());
 
-            if (href) {
+            const normalizedHref = normalizeHttpUrl(href, sourceUrl);
+            if (normalizedHref) {
               links.push({
                 host,
-                url: href,
+                url: normalizedHref,
               });
             }
           });

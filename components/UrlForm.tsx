@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { ScanSearch, Loader2 } from "lucide-react";
 import { useLocale } from "@/lib/i18n/LocaleContext";
+import { isKusonimeArticleUrl } from "@/lib/urls";
 
 interface UrlFormProps {
   onSubmit: (url: string) => void;
@@ -13,12 +14,7 @@ interface UrlFormProps {
 export default function UrlForm({ onSubmit, loading }: UrlFormProps) {
   const { t } = useLocale();
   const [value, setValue] = useState("");
-  const [isValid, setIsValid] = useState(false);
-
-  useEffect(() => {
-    const kusonimeRegex = /^https?:\/\/(www\.)?kusonime\.com\/[a-zA-Z0-9-]+\/?$/;
-    setIsValid(kusonimeRegex.test(value.trim()));
-  }, [value]);
+  const isValid = isKusonimeArticleUrl(value.trim());
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -30,20 +26,32 @@ export default function UrlForm({ onSubmit, loading }: UrlFormProps) {
   const canInteract = !loading && (isValid || value.length === 0);
 
   return (
-    <form onSubmit={handleSubmit} className="w-full">
+    <form
+      onSubmit={handleSubmit}
+      className="w-full"
+      aria-label={t.form.ariaLabel}
+    >
       <div className="flex flex-col sm:flex-row gap-4 sm:items-stretch">
         <div className="hard-border flex-1 bg-kuso-paper flex items-center px-4 py-2 sm:py-0 relative transition-all duration-150 focus-within:ring-4 focus-within:ring-kuso-accent/25 focus-within:shadow-hard-sm">
           <span className="font-mono text-xs font-bold text-kuso-ink/50 mr-3 select-none">
             URL//
           </span>
+          <label htmlFor="kusonime-url" className="sr-only">
+            {t.form.ariaLabel}
+          </label>
           <input
+            id="kusonime-url"
+            name="url"
             value={value}
             onChange={(e) => setValue(e.target.value)}
             placeholder={t.form.placeholder}
             disabled={loading}
             aria-label={t.form.ariaLabel}
             aria-invalid={showError}
+            aria-describedby={showError ? "kusonime-url-error" : undefined}
+            required
             inputMode="url"
+            enterKeyHint="go"
             autoComplete="off"
             spellCheck={false}
             className="flex-1 border-none outline-none focus-visible:outline-none bg-transparent py-3 sm:py-4 font-mono text-sm sm:text-base text-kuso-ink placeholder:text-kuso-ink/35 disabled:opacity-50 w-full"
@@ -92,6 +100,7 @@ export default function UrlForm({ onSubmit, loading }: UrlFormProps) {
           <motion.p
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
+            id="kusonime-url-error"
             className="font-mono text-xs font-bold text-kuso-accent inline-flex items-center gap-2 bg-kuso-accent/10 px-2 py-1"
           >
             <span className="w-2 h-2 bg-kuso-accent animate-pulse" />

@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import LocalizedHome from "@/components/LocalizedHome";
 import { getLocalizedMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = getLocalizedMetadata("id");
+export const metadata: Metadata = getLocalizedMetadata("ja");
 
-export default function HomePage() {
-  return <LocalizedHome locale="id" />;
+export default function JapaneseHomePage() {
+  return <LocalizedHome locale="ja" />;
 }

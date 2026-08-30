@@ -1,30 +1,34 @@
 "use client";
 
+import Link from "next/link";
 import { useLocale } from "@/lib/i18n/LocaleContext";
 import { LOCALES, LOCALE_LABELS } from "@/lib/i18n/dictionaries";
+import { localizedPath } from "@/lib/seo";
 
-export default function LocaleSwitcher() {
+export default function LocaleSwitcher({ path = "" }: { path?: string }) {
   const { locale, setLocale, t } = useLocale();
 
   return (
     <div className="flex" role="group" aria-label={t.a11y.switcher}>
-      {LOCALES.map((l, i) => {
-        const active = locale === l;
+      {LOCALES.map((nextLocale, index) => {
+        const active = locale === nextLocale;
+
         return (
-          <button
-            key={l}
-            onClick={() => setLocale(l)}
-            aria-pressed={active}
+          <Link
+            key={nextLocale}
+            href={localizedPath(nextLocale, path)}
+            onClick={() => setLocale(nextLocale)}
+            aria-current={active ? "page" : undefined}
             className={`hard-border press-effect px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-widest
-              ${i > 0 ? "-ml-[3px]" : ""}
+              ${index > 0 ? "-ml-[3px]" : ""}
               ${
                 active
                   ? "bg-kuso-accent text-kuso-paper relative z-10 shadow-hard-sm"
                   : "bg-kuso-paper hover:bg-kuso-tape"
               }`}
           >
-            {LOCALE_LABELS[l]}
-          </button>
+            {LOCALE_LABELS[nextLocale]}
+          </Link>
         );
       })}
     </div>

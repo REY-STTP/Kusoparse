@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp, ExternalLink, Loader2 } from "lucide-react";
 import type { ParsedAnime } from "@/lib/parseKusonime";
 import { useLocale } from "@/lib/i18n/LocaleContext";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
+import { normalizeHttpUrl } from "@/lib/urls";
 
 function getStamp(info: Record<string, string>, t: Dictionary) {
   const status = (info["Status"] ?? "").toLowerCase();
@@ -42,18 +43,6 @@ export default function AnimeCard({ data }: { data: ParsedAnime }) {
   const [isResolving, setIsResolving] = useState(false);
   const [activeHost, setActiveHost] = useState<string | null>(null);
 
-  useEffect(() => {
-    setOpenGroup(0);
-
-    const firstGroup = data.downloads[0];
-
-    setOpenRes(
-      firstGroup
-        ? Object.keys(firstGroup.downloads)[0] ?? null
-        : null
-    );
-  }, [data]);
-
   async function handleDownloadClick(resolution: string, host: string, url: string) {
     if (isResolving) return;
     setIsResolving(true);
@@ -62,10 +51,16 @@ export default function AnimeCard({ data }: { data: ParsedAnime }) {
       const params = new URLSearchParams({ url, resolution, host });
       const res = await fetch(`/api/resolve?${params.toString()}`);
       const json = await res.json();
-      const finalUrl = typeof json.url === "string" ? json.url : url;
-      window.open(finalUrl, "_blank", "noopener,noreferrer");
+      const finalUrl = res.ok ? normalizeHttpUrl(json.url) : null;
+      const fallbackUrl = normalizeHttpUrl(url);
+      if (finalUrl || fallbackUrl) {
+        window.open(finalUrl ?? fallbackUrl!, "_blank", "noopener,noreferrer");
+      }
     } catch {
-      window.open(url, "_blank", "noopener,noreferrer");
+      const fallbackUrl = normalizeHttpUrl(url);
+      if (fallbackUrl) {
+        window.open(fallbackUrl, "_blank", "noopener,noreferrer");
+      }
     } finally {
       setIsResolving(false);
       setActiveHost(null);
@@ -73,6 +68,8 @@ export default function AnimeCard({ data }: { data: ParsedAnime }) {
   }
 
   const orderedInfo = INFO_ORDER.filter((k) => data.info[k]).map((k) => [k, data.info[k]]) as [string, string][];
+  const sourceUrl = normalizeHttpUrl(data.sourceUrl);
+  const thumbnailUrl = normalizeHttpUrl(data.thumbnail);
 
   return (
     <motion.div
@@ -89,22 +86,35 @@ export default function AnimeCard({ data }: { data: ParsedAnime }) {
         {stamp.label}
       </div>
 
-      <div className="font-mono text-xs opacity-50 mb-2 lowercase italic tracking-wider">
-        {t.card.found}
+      <div className="flex flex-wrap items-center justify-between gap-3 font-mono text-xs opacity-50 mb-2 lowercase italic tracking-wider">
+        <span>{t.card.found}</span>
+        {sourceUrl && (
+          <a
+            href={sourceUrl}
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+            className="not-italic underline underline-offset-2 hover:text-kuso-accent"
+          >
+            {t.seo.sourceLabel}
+          </a>
+        )}
       </div>
 
-      {data.thumbnail && (
+      {thumbnailUrl && (
         <div className="mb-6 w-full relative">
+          {/* External artwork is intentionally loaded by the browser, not proxied through Next.js. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={data.thumbnail}
+            src={thumbnailUrl}
             alt={data.title ? t.card.coverAlt(data.title) : t.card.coverAltFallback}
             className="w-full h-auto object-cover hard-border shadow-hard max-h-[350px] bg-kuso-tape"
             loading="lazy"
+            decoding="async"
           />
         </div>
       )}
 
-      <h2 className="font-display font-black text-2xl sm:text-3xl leading-tight tracking-[-0.01em] text-balance mb-4">
+      <h2 className="font-display font-black text-2xl sm:text-3xl leading-tight text-balance mb-4">
         {data.title}
       </h2>
 

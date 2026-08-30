@@ -20,6 +20,7 @@ yarn-error.log*
 pnpm-debug.log*
 
 # TypeScript incremental build cache
+next-env.d.ts
 *.tsbuildinfo
 
 # Editors / IDEs
@@ -28,7 +29,3 @@ pnpm-debug.log*
 
 # Vercel
 .vercel
-
-# Agent tooling (local skills)
-.agents/
-skills-lock.json
