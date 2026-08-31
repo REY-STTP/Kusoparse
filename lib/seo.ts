@@ -101,7 +101,7 @@ export function getLayoutMetadata(locale: Locale): Metadata {
     },
     icons: {
       icon: [
-        { url: "/icon.png", type: "image/png" },
+        { url: "/icon.png", type: "image/png", sizes: "512x512" },
         { url: "/favicon.ico", sizes: "32x32" },
       ],
       apple: "/apple-icon.png",
