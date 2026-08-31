@@ -1,6 +1,7 @@
 import { dictionaries, type Locale } from "@/lib/i18n/dictionaries";
 import { absoluteUrl, SITE_NAME, SITE_URL } from "@/lib/site";
-import { localizedPath } from "@/lib/seo";
+import { localizedPath, pagePath, type LocalizedPage } from "@/lib/seo";
+import { DIRECT_HOSTS, INTERMEDIARY_HOSTS } from "@/lib/hosts";
 
 function serializeJsonLd(value: unknown) {
   return JSON.stringify(value).replace(/</g, "\\u003c");
@@ -11,15 +12,23 @@ export default function StructuredData({
   page = "home",
 }: {
   locale?: Locale;
-  page?: "home" | "guide";
+  page?: LocalizedPage;
 }) {
   const content = dictionaries[locale].seo;
-  const pageUrl = absoluteUrl(
-    page === "guide" ? localizedPath(locale, "panduan") : localizedPath(locale),
-  );
-  const pageTitle = page === "guide" ? content.guideTitle : content.metaTitle;
+  const pageUrl = absoluteUrl(pagePath(locale, page));
+  const pageTitle =
+    page === "guide"
+      ? content.guideTitle
+      : page === "hosts"
+        ? content.hostsMetaTitle
+        : content.metaTitle;
   const pageDescription =
-    page === "guide" ? content.guideDescription : content.description;
+    page === "guide"
+      ? content.guideDescription
+      : page === "hosts"
+        ? content.hostsDescription
+        : content.description;
+  const supportedHosts = [...DIRECT_HOSTS, ...INTERMEDIARY_HOSTS];
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -64,14 +73,17 @@ export default function StructuredData({
         description: pageDescription,
         isPartOf: { "@id": `${SITE_URL}/#website` },
         inLanguage: locale === "id" ? "id-ID" : locale,
-        ...(page === "guide"
-          ? {
+        ...(page === "home"
+          ? { mainEntity: { "@id": `${SITE_URL}/#application` } }
+          : {
               breadcrumb: { "@id": `${pageUrl}#breadcrumb` },
-              mainEntity: { "@id": `${pageUrl}#how-to` },
-            }
-          : { mainEntity: { "@id": `${SITE_URL}/#application` } }),
+              mainEntity: {
+                "@id":
+                  page === "guide" ? `${pageUrl}#how-to` : `${pageUrl}#hosts`,
+              },
+            }),
       },
-      ...(page === "guide"
+      ...(page !== "home"
         ? [
             {
               "@type": "BreadcrumbList",
@@ -86,38 +98,58 @@ export default function StructuredData({
                 {
                   "@type": "ListItem",
                   position: 2,
-                  name: content.guideTitle,
+                  name: pageTitle,
                   item: pageUrl,
                 },
               ],
             },
           ]
         : []),
-      {
-        "@type": "HowTo",
-        "@id": `${pageUrl}#how-to`,
-        name: content.howToTitle,
-        description: content.description,
-        totalTime: "PT1M",
-        step: content.howToSteps.map((text, index) => ({
-          "@type": "HowToStep",
-          position: index + 1,
-          name: text,
-          text,
-        })),
-      },
-      {
-        "@type": "FAQPage",
-        "@id": `${pageUrl}#faq`,
-        mainEntity: content.faq.map((item) => ({
-          "@type": "Question",
-          name: item.question,
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: item.answer,
-          },
-        })),
-      },
+      ...(page === "hosts"
+        ? [
+            {
+              "@type": "ItemList",
+              "@id": `${pageUrl}#hosts`,
+              name: content.hostsTitle,
+              numberOfItems: supportedHosts.length,
+              itemListElement: supportedHosts.map((host, index) => ({
+                "@type": "ListItem",
+                position: index + 1,
+                name: host,
+                url: `https://${host}`,
+              })),
+            },
+          ]
+        : []),
+      ...(page !== "hosts"
+        ? [
+            {
+              "@type": "HowTo",
+              "@id": `${pageUrl}#how-to`,
+              name: content.howToTitle,
+              description: content.description,
+              totalTime: "PT1M",
+              step: content.howToSteps.map((text, index) => ({
+                "@type": "HowToStep",
+                position: index + 1,
+                name: text,
+                text,
+              })),
+            },
+            {
+              "@type": "FAQPage",
+              "@id": `${pageUrl}#faq`,
+              mainEntity: content.faq.map((item) => ({
+                "@type": "Question",
+                name: item.question,
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: item.answer,
+                },
+              })),
+            },
+          ]
+        : []),
     ],
   };
 

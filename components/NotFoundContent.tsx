@@ -5,7 +5,7 @@ import LocaleSwitcher from "@/components/LocaleSwitcher";
 import { useLocale } from "@/lib/i18n/LocaleContext";
 import { localizedPath } from "@/lib/seo";
 
-export default function NotFound() {
+export default function NotFoundContent() {
   const { locale, t } = useLocale();
 
   return (

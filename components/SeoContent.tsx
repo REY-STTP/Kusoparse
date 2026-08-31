@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useLocale } from "@/lib/i18n/LocaleContext";
-import { localizedPath } from "@/lib/seo";
+import { guidePath, hostsPath } from "@/lib/seo";
 
 export default function SeoContent() {
   const { locale, t } = useLocale();
@@ -68,12 +68,20 @@ export default function SeoContent() {
               </li>
             ))}
           </ol>
-          <Link
-            href={localizedPath(locale, "panduan")}
-            className="inline-flex mt-5 font-mono text-xs font-bold uppercase tracking-wider underline decoration-2 underline-offset-4 hover:text-kuso-accent"
-          >
-            {t.seo.guideLink}
-          </Link>
+          <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2">
+            <Link
+              href={guidePath(locale)}
+              className="font-mono text-xs font-bold uppercase tracking-wider underline decoration-2 underline-offset-4 hover:text-kuso-accent"
+            >
+              {t.seo.guideLink}
+            </Link>
+            <Link
+              href={hostsPath(locale)}
+              className="font-mono text-xs font-bold uppercase tracking-wider underline decoration-2 underline-offset-4 hover:text-kuso-accent"
+            >
+              {t.seo.hostsLink}
+            </Link>
+          </div>
         </div>
 
         <div id="faq" aria-labelledby="faq-title">

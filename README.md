@@ -16,17 +16,20 @@ Dibangun dengan Next.js App Router, bergaya risograph print / neo-brutalist, dan
 ### Multibahasa
 
 - UI dan metadata tersedia dalam Bahasa Indonesia (`/`), English (`/en`), dan 日本語 (`/ja`).
-- Route crawlable per bahasa: `/`, `/en`, `/ja` + panduan `/panduan`, `/en/panduan`, `/ja/panduan`.
+- Route crawlable per bahasa: home `/`, `/en`, `/ja`; panduan `/panduan`, `/en/guide`, `/ja/guide`; daftar host `/hosts`, `/en/hosts`, `/ja/hosts`.
+- Setiap bahasa dirender lewat route group sendiri (`app/(id)`, `app/(en)`, `app/(ja)`) dengan root layout `<html lang>` statis — semua halaman konten ter-prerender (static) tanpa `headers()` di layout.
 - Social preview image (Open Graph + Twitter) ter-lokalisasi per bahasa.
 - Error API juga diterjemahkan (`/api/parse?lang=…`).
 
 ### Search-ready (SEO / GEO / AEO / LLMO)
 
-- **Metadata** — title, description, dan canonical unik per bahasa; hreflang lengkap (`id-ID`, `en`, `ja`, `x-default`) di semua halaman.
-- **Structured data** — JSON-LD `Organization`, `WebSite`, `WebApplication`, `WebPage`, `HowTo`, `FAQPage`, dan `BreadcrumbList`.
-- **Konten semantik** — FAQ, cara penggunaan, fitur, dan batasan layanan ter-render di HTML (SSR), bukan hanya di schema.
-- **Discovery** — `sitemap.xml` dengan alternate languages, `robots.txt`, `manifest.webmanifest`, dan `llms.txt` untuk agen AI/LLM.
-- **Verifikasi** — meta tag Google Search Console (`verification.google` di root layout).
+- **Metadata** — title, description, dan canonical unik per bahasa; hreflang lengkap (`id-ID`, `en`, `ja`, `x-default`) di semua halaman; slug panduan ter-lokalisasi (`/panduan`, `/en/guide`, `/ja/guide`) dengan redirect permanen dari slug lama.
+- **Structured data** — JSON-LD `Organization`, `WebSite`, `WebApplication`, `WebPage`, `HowTo`, `FAQPage`, `BreadcrumbList`, dan `ItemList` (daftar 15 host di halaman hosts).
+- **Konten semantik** — FAQ, cara penggunaan, fitur, batasan layanan, dan daftar host ter-render di HTML (SSR statis), bukan hanya di schema.
+- **Fakta kutipabel (GEO)** — jumlah host konsisten di seluruh situs: 12 host download langsung + 3 resolver shortlink (`lib/hosts.ts` sebagai sumber tunggal).
+- **Discovery** — `sitemap.xml` (9 URL + alternate languages), `robots.txt`, `manifest.webmanifest`, `llms.txt` (ringkasan + tautan markdown), dan `llms-full.txt` (konten lengkap: fitur, langkah, FAQ, batasan, daftar host) untuk agen AI/LLM.
+- **Rendering statis** — seluruh halaman konten `○ Static` (prerender, disajikan dari CDN edge); hanya catch-all 404 dan API yang dinamis.
+- **Verifikasi** — meta tag Google Search Console (`verification.google` di metadata layout tiap locale).
 
 ### Keamanan
 
@@ -70,33 +73,49 @@ npm run start    # jalankan build produksi
 
 ```
 app/
-  page.tsx                  # Halaman utama Bahasa Indonesia
-  en/ + ja/                 # Halaman utama, panduan, dan social image terlokalisasi
-  panduan/page.tsx          # Panduan, langkah penggunaan, dan FAQ
-  layout.tsx                # Font, metadata global, verifikasi GSC, LocaleProvider
-  not-found.tsx             # 404 kustom
-  robots.ts                 # robots.txt
-  sitemap.ts                # sitemap.xml + alternate languages
-  manifest.ts               # manifest.webmanifest (PWA)
-  llms.txt/route.ts         # Ringkasan mesin untuk agen AI/LLM
-  opengraph-image.tsx       # Social preview (id) + varian en/ja
-  twitter-image.tsx         # Social preview (id) + varian en/ja
+  (id)/                     # Route group Bahasa Indonesia (root layout sendiri)
+    layout.tsx              # <html lang="id-ID">, font, metadata, LocaleProvider
+    page.tsx                # Halaman utama (/)
+    panduan/page.tsx        # Panduan + FAQ (/panduan)
+    hosts/page.tsx          # Daftar host yang didukung (/hosts)
+    opengraph-image.tsx     # Social preview (id)
+    twitter-image.tsx
+    not-found.tsx           # 404 kustom (locale ini)
+    [...rest]/page.tsx      # Catch-all -> 404 dengan layout locale
+  (en)/                     # Route group English — pola yang sama di bawah /en
+    en/page.tsx             # /en
+    en/guide/page.tsx       # /en/guide (redirect 308 dari /en/panduan)
+    en/hosts/page.tsx       # /en/hosts
+    en/opengraph-image.tsx  # /en/opengraph-image
+    en/twitter-image.tsx
+    not-found.tsx
+    en/[...rest]/page.tsx
+  (ja)/                     # Route group 日本語 — pola yang sama di bawah /ja
   api/parse/route.ts        # Endpoint parsing (lang-aware, validasi URL, noindex)
   api/resolve/route.ts      # Endpoint resolve shortlink (allowlist, noindex)
+  robots.ts                 # robots.txt
+  sitemap.ts                # sitemap.xml (9 URL + alternate languages)
+  manifest.ts               # manifest.webmanifest (PWA)
+  llms.txt/route.ts         # Ringkasan mesin untuk agen AI/LLM (markdown links)
+  llms-full.txt/route.ts    # Konten lengkap untuk agen AI/LLM (FAQ, fitur, host)
+  globals.css
+  icon.png / apple-icon.png
 components/
   HomeClient.tsx            # Halaman utama (hero, form, hasil, SEO content)
   GuideClient.tsx           # Halaman panduan
-  LocalizedHome.tsx         # Wrapper locale + structured data
-  LocalizedGuide.tsx        # Wrapper locale + structured data
+  HostsContent.tsx          # Halaman daftar host (server component)
+  NotFoundContent.tsx       # 404 kustom (dipakai semua group)
   UrlForm.tsx               # Form input URL + validasi
   AnimeCard.tsx             # Kartu hasil (info, sinopsis, link, atribusi sumber)
   SeoContent.tsx            # Konten semantik: fitur, how-to, FAQ
-  StructuredData.tsx        # JSON-LD @graph per halaman
-  LocaleSwitcher.tsx        # Toggle ID / EN / JP
+  StructuredData.tsx        # JSON-LD @graph per halaman (home/guide/hosts)
+  LocaleSwitcher.tsx        # Toggle ID / EN / JP dengan path per-locale
   SkipLink.tsx              # Skip-to-content link
 lib/
-  site.ts                   # SITE_URL + absoluteUrl
-  seo.ts                    # Metadata localized, canonical, hreflang
+  site.ts                   # SITE_URL + absoluteUrl + verifikasi GSC
+  seo.ts                    # Metadata localized, canonical, hreflang, path per-halaman
+  hosts.ts                  # Sumber tunggal daftar host (12 direct + 3 resolver)
+  fonts.ts                  # Font bersama untuk semua root layout
   urls.ts                   # Validasi URL Kusonime + normalisasi http(s)
   http.ts                   # Pembaca response body dengan batas ukuran
   parseKusonime.ts          # Scraper cheerio halaman Kusonime
@@ -105,7 +124,8 @@ lib/
   i18n/                     # dictionaries.ts + LocaleContext.tsx
 hooks/
   useKuso.ts                # State parsing (loading / error / data)
-proxy.ts                    # Redirect kanonik + header locale per request
+proxy.ts                    # Redirect kanonik ke origin publik (301)
+next.config.mjs             # Redirect slug lama (en/ja panduan -> guide) + image patterns
 eslint.config.mjs           # Flat config ESLint 9
 ```
 

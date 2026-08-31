@@ -19,6 +19,10 @@ export const SITE_NAME = "KUSOPARSE";
 export const SITE_DESCRIPTION =
   "Parser URL Kusonime untuk mengambil metadata anime, informasi episode, sinopsis, dan link download dalam satu tampilan.";
 
+// Google Search Console verification token for the site.
+export const GOOGLE_SITE_VERIFICATION =
+  "LKO88BruVcnQmYN33rV5V-vD97Ep9hrhSKUdHGsilMs";
+
 export function absoluteUrl(path = "/") {
   return new URL(path, `${SITE_URL}/`).toString();
 }

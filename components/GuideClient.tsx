@@ -3,7 +3,7 @@
 import Link from "next/link";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
 import { useLocale } from "@/lib/i18n/LocaleContext";
-import { localizedPath } from "@/lib/seo";
+import { hostsPath, localizedPath } from "@/lib/seo";
 
 export default function GuideClient() {
   const { locale, t } = useLocale();
@@ -26,7 +26,7 @@ export default function GuideClient() {
 
       <div className="w-full max-w-3xl mx-auto px-5 pt-8 sm:pt-12 pb-12">
         <div className="flex justify-end mb-10">
-          <LocaleSwitcher path="panduan" />
+          <LocaleSwitcher page="guide" />
         </div>
 
         <article>
@@ -127,12 +127,18 @@ export default function GuideClient() {
           </div>
         </article>
 
-        <nav aria-label={t.seo.backHome} className="mt-12">
+        <nav aria-label={t.seo.backHome} className="mt-12 flex flex-wrap gap-3">
           <Link
             href={localizedPath(locale)}
             className="hard-border press-effect inline-flex bg-kuso-ink text-kuso-paper px-5 py-3 font-mono text-sm font-bold shadow-hard-sm hover:bg-kuso-accent"
           >
             {t.seo.backHome}
+          </Link>
+          <Link
+            href={hostsPath(locale)}
+            className="hard-border press-effect inline-flex bg-kuso-paper px-5 py-3 font-mono text-sm font-bold shadow-hard-sm hover:bg-kuso-tape"
+          >
+            {t.seo.hostsLink}
           </Link>
         </nav>
       </div>

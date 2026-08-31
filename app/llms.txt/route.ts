@@ -1,6 +1,15 @@
 import { absoluteUrl, SITE_DESCRIPTION, SITE_NAME } from "@/lib/site";
+import { guidePath, hostsPath, localizedPath } from "@/lib/seo";
+import {
+  DIRECT_HOST_COUNT,
+  INTERMEDIARY_HOST_COUNT,
+} from "@/lib/hosts";
 
 export const dynamic = "force-static";
+
+function link(label: string, path: string) {
+  return `- [${label}](${absoluteUrl(path)})`;
+}
 
 export function GET() {
   const body = `# ${SITE_NAME}
@@ -10,6 +19,8 @@ export function GET() {
 ## What this site does
 
 KUSOPARSE is an independent web utility. A user submits a Kusonime article URL, and the application extracts the article's available anime title, thumbnail, metadata, synopsis, episode groups, resolutions, and outbound links.
+
+The parser recognizes ${DIRECT_HOST_COUNT} direct download hosts and ${INTERMEDIARY_HOST_COUNT} shortlink resolvers.
 
 ## How it works
 
@@ -27,17 +38,21 @@ KUSOPARSE is an independent web utility. A user submits a Kusonime article URL, 
 
 ## Public pages
 
-- Home: ${absoluteUrl("/")}
-- English home: ${absoluteUrl("/en")}
-- Japanese home: ${absoluteUrl("/ja")}
-- Indonesian guide: ${absoluteUrl("/panduan")}
-- English guide: ${absoluteUrl("/en/panduan")}
-- Japanese guide: ${absoluteUrl("/ja/panduan")}
+${link("Home (Bahasa Indonesia)", localizedPath("id"))}
+${link("Home (English)", localizedPath("en"))}
+${link("Home (Japanese)", localizedPath("ja"))}
+${link("Guide (Bahasa Indonesia)", guidePath("id"))}
+${link("Guide (English)", guidePath("en"))}
+${link("Guide (Japanese)", guidePath("ja"))}
+${link("Supported hosts (Bahasa Indonesia)", hostsPath("id"))}
+${link("Supported hosts (English)", hostsPath("en"))}
+${link("Supported hosts (Japanese)", hostsPath("ja"))}
 
 ## Machine-readable endpoints
 
-- Sitemap: ${absoluteUrl("/sitemap.xml")}
-- Robots: ${absoluteUrl("/robots.txt")}
+${link("Sitemap", "/sitemap.xml")}
+${link("Robots", "/robots.txt")}
+${link("Full content for LLMs (llms-full.txt)", "/llms-full.txt")}
 `;
 
   return new Response(body, {

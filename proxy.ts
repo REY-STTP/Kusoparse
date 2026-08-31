@@ -3,12 +3,6 @@ import { SITE_URL } from "@/lib/site";
 
 const PUBLIC_SITE = new URL(SITE_URL);
 
-function getRequestLocale(pathname: string) {
-  if (pathname === "/en" || pathname.startsWith("/en/")) return "en";
-  if (pathname === "/ja" || pathname.startsWith("/ja/")) return "ja";
-  return "id";
-}
-
 function firstForwardedValue(value: string | null) {
   return value?.split(",", 1)[0]?.trim() || null;
 }
@@ -69,10 +63,7 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(destination, 301);
   }
 
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.set("x-kusoparse-locale", getRequestLocale(request.nextUrl.pathname));
-
-  return NextResponse.next({ request: { headers: requestHeaders } });
+  return NextResponse.next();
 }
 
 export const config = {

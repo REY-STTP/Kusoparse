@@ -84,12 +84,6 @@ const id = {
     metaTitle: "Parser URL Kusonime: Metadata Anime dan Link Download",
     description:
       "KUSOPARSE adalah parser URL Kusonime untuk mengambil metadata anime, sinopsis, informasi episode, dan link download dari halaman artikel.",
-    keywords: [
-      "parser Kusonime",
-      "Kusonime URL parser",
-      "metadata anime",
-      "link download anime",
-    ],
     eyebrow: "Tentang KUSOPARSE",
     title: "Parser URL Kusonime untuk metadata yang lebih rapi",
     featuresTitle: "Yang bisa dilakukan KUSOPARSE",
@@ -163,6 +157,17 @@ const id = {
     ],
     sourceLabel: "Buka artikel sumber",
     backHome: "Kembali ke parser",
+    hostsLink: "Lihat host yang didukung",
+    hostsMetaTitle: "Host Download dan Resolver Shortlink yang Didukung",
+    hostsTitle: "Host yang didukung KUSOPARSE",
+    hostsDescription:
+      "Daftar host download langsung dan resolver shortlink yang dikenali KUSOPARSE saat memproses link dari artikel Kusonime.",
+    hostsIntro:
+      "KUSOPARSE meneruskan link apa pun yang tersedia pada artikel sumber. Host berikut dikenali sebagai host download langsung, atau sebagai shortlink yang dapat di-resolve otomatis.",
+    hostsDirectTitle: "Host download langsung",
+    hostsResolverTitle: "Resolver shortlink",
+    hostsNote:
+      "Ketersediaan link bergantung pada artikel sumber dan host pihak ketiga. KUSOPARSE tidak berafiliasi dengan host-host di atas.",
   },
 };
 
@@ -244,12 +249,6 @@ const en: Dictionary = {
     metaTitle: "Kusonime URL Parser: Anime Metadata and Download Links",
     description:
       "KUSOPARSE is a Kusonime URL parser that extracts anime metadata, synopsis, episode information, and links from an article page.",
-    keywords: [
-      "Kusonime parser",
-      "Kusonime URL parser",
-      "anime metadata",
-      "anime download links",
-    ],
     eyebrow: "About KUSOPARSE",
     title: "A clearer parser for Kusonime article URLs",
     featuresTitle: "What KUSOPARSE does",
@@ -323,6 +322,17 @@ const en: Dictionary = {
     ],
     sourceLabel: "Open source article",
     backHome: "Back to parser",
+    hostsLink: "See supported hosts",
+    hostsMetaTitle: "Supported Download Hosts and Shortlink Resolvers",
+    hostsTitle: "Hosts supported by KUSOPARSE",
+    hostsDescription:
+      "The direct download hosts and shortlink resolvers KUSOPARSE recognizes when processing links from a Kusonime article.",
+    hostsIntro:
+      "KUSOPARSE passes through every link available on the source article. The hosts below are recognized as direct download hosts, or as shortlinks the resolver can expand automatically.",
+    hostsDirectTitle: "Direct download hosts",
+    hostsResolverTitle: "Shortlink resolvers",
+    hostsNote:
+      "Link availability depends on the source article and third-party hosts. KUSOPARSE is not affiliated with the hosts listed above.",
   },
 };
 
@@ -402,12 +412,6 @@ const ja: Dictionary = {
     metaTitle: "Kusonime URL解析: アニメ情報とダウンロードリンク",
     description:
       "KUSOPARSEは、記事URLからアニメのメタデータ、あらすじ、エピソード情報、利用可能なリンクを取得するKusonime解析ツールです。",
-    keywords: [
-      "Kusonime 解析",
-      "Kusonime URL parser",
-      "アニメ メタデータ",
-      "アニメ ダウンロードリンク",
-    ],
     eyebrow: "KUSOPARSEについて",
     title: "Kusonime記事URLを整理して解析",
     featuresTitle: "KUSOPARSEでできること",
@@ -481,6 +485,17 @@ const ja: Dictionary = {
     ],
     sourceLabel: "元記事を開く",
     backHome: "解析画面に戻る",
+    hostsLink: "対応ホストを見る",
+    hostsMetaTitle: "対応ダウンロードホストと短縮リンクリゾルバ",
+    hostsTitle: "KUSOPARSEが対応するホスト",
+    hostsDescription:
+      "Kusonime記事のリンクを処理する際にKUSOPARSEが認識する直接ダウンロードホストと短縮リンクリゾルバの一覧。",
+    hostsIntro:
+      "KUSOPARSEはソース記事にあるリンクをすべてそのまま渡します。以下のホストは直接ダウンロードホスト、またはリゾルバが自動展開できる短縮リンクとして認識されます。",
+    hostsDirectTitle: "直接ダウンロードホスト",
+    hostsResolverTitle: "短縮リンクリゾルバ",
+    hostsNote:
+      "リンクの可用性はソース記事とサードパーティホストに依存します。KUSOPARSEは上記のホストと提携関係にありません。",
   },
 };
 

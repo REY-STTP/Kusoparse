@@ -4,6 +4,7 @@ import * as cheerio from "cheerio";
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 import { readLimitedText } from "@/lib/http";
+import { DIRECT_HOSTS, INTERMEDIARY_HOSTS } from "@/lib/hosts";
 
 export interface ResolveOptions {
   resolution?: string;
@@ -20,26 +21,8 @@ export interface ResolveResult {
 
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36";
 
-const DIRECT_HOSTS = new Set([
-  "acefile.co",
-  "drive.google.com",
-  "drive.usercontent.google.com",
-  "krakenfiles.com",
-  "terabox.com",
-  "1024terabox.com",
-  "mega.nz",
-  "megaup.net",
-  "buzzheavier.com",
-  "hxfile.co",
-  "gofile.io",
-  "pixeldrain.com",
-]);
-
-const INTERMEDIARY_HOSTS = new Set([
-  "justpaste.it",
-  "shrinkearn.com",
-  "tpi.li",
-]);
+const DIRECT_HOST_SET = new Set<string>(DIRECT_HOSTS);
+const INTERMEDIARY_HOST_SET = new Set<string>(INTERMEDIARY_HOSTS);
 
 function parseHttpUrl(value: string | URL): URL | null {
   try {
@@ -138,11 +121,11 @@ async function resolvesToPublicAddress(hostname: string) {
 }
 
 function isDirectHost(value: string | URL): boolean {
-  return matchesHost(value, DIRECT_HOSTS);
+  return matchesHost(value, DIRECT_HOST_SET);
 }
 
 function isIntermediaryHost(value: string | URL): boolean {
-  return matchesHost(value, INTERMEDIARY_HOSTS);
+  return matchesHost(value, INTERMEDIARY_HOST_SET);
 }
 
 function isJustpasteHost(value: string | URL): boolean {

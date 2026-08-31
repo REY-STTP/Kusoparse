@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { useLocale } from "@/lib/i18n/LocaleContext";
 import { LOCALES, LOCALE_LABELS } from "@/lib/i18n/dictionaries";
-import { localizedPath } from "@/lib/seo";
+import { pagePath, type LocalizedPage } from "@/lib/seo";
 
-export default function LocaleSwitcher({ path = "" }: { path?: string }) {
+export default function LocaleSwitcher({ page = "home" }: { page?: LocalizedPage }) {
   const { locale, setLocale, t } = useLocale();
 
   return (
@@ -16,7 +16,7 @@ export default function LocaleSwitcher({ path = "" }: { path?: string }) {
         return (
           <Link
             key={nextLocale}
-            href={localizedPath(nextLocale, path)}
+            href={pagePath(nextLocale, page)}
             onClick={() => setLocale(nextLocale)}
             aria-current={active ? "page" : undefined}
             className={`hard-border press-effect px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-widest

@@ -1,85 +1,26 @@
 import type { MetadataRoute } from "next";
+import { LOCALES, type Locale } from "@/lib/i18n/dictionaries";
 import { absoluteUrl } from "@/lib/site";
+import { getLanguageAlternates, pagePath, type LocalizedPage } from "@/lib/seo";
+
+function localizedEntries(
+  page: LocalizedPage,
+  changeFrequency: "monthly" | "yearly",
+  idPriority: number,
+  otherPriority: number,
+): MetadataRoute.Sitemap {
+  return LOCALES.map((locale: Locale) => ({
+    url: absoluteUrl(pagePath(locale, page)),
+    changeFrequency,
+    priority: locale === "id" ? idPriority : otherPriority,
+    alternates: { languages: getLanguageAlternates(page) },
+  }));
+}
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
-    {
-      url: absoluteUrl("/"),
-      changeFrequency: "monthly",
-      priority: 1,
-      alternates: {
-        languages: {
-          "id-ID": absoluteUrl("/"),
-          en: absoluteUrl("/en"),
-          ja: absoluteUrl("/ja"),
-          "x-default": absoluteUrl("/"),
-        },
-      },
-    },
-    {
-      url: absoluteUrl("/en"),
-      changeFrequency: "monthly",
-      priority: 0.8,
-      alternates: {
-        languages: {
-          "id-ID": absoluteUrl("/"),
-          en: absoluteUrl("/en"),
-          ja: absoluteUrl("/ja"),
-          "x-default": absoluteUrl("/"),
-        },
-      },
-    },
-    {
-      url: absoluteUrl("/ja"),
-      changeFrequency: "monthly",
-      priority: 0.8,
-      alternates: {
-        languages: {
-          "id-ID": absoluteUrl("/"),
-          en: absoluteUrl("/en"),
-          ja: absoluteUrl("/ja"),
-          "x-default": absoluteUrl("/"),
-        },
-      },
-    },
-    {
-      url: absoluteUrl("/panduan"),
-      changeFrequency: "yearly",
-      priority: 0.7,
-      alternates: {
-        languages: {
-          "id-ID": absoluteUrl("/panduan"),
-          en: absoluteUrl("/en/panduan"),
-          ja: absoluteUrl("/ja/panduan"),
-          "x-default": absoluteUrl("/panduan"),
-        },
-      },
-    },
-    {
-      url: absoluteUrl("/en/panduan"),
-      changeFrequency: "yearly",
-      priority: 0.6,
-      alternates: {
-        languages: {
-          "id-ID": absoluteUrl("/panduan"),
-          en: absoluteUrl("/en/panduan"),
-          ja: absoluteUrl("/ja/panduan"),
-          "x-default": absoluteUrl("/panduan"),
-        },
-      },
-    },
-    {
-      url: absoluteUrl("/ja/panduan"),
-      changeFrequency: "yearly",
-      priority: 0.6,
-      alternates: {
-        languages: {
-          "id-ID": absoluteUrl("/panduan"),
-          en: absoluteUrl("/en/panduan"),
-          ja: absoluteUrl("/ja/panduan"),
-          "x-default": absoluteUrl("/panduan"),
-        },
-      },
-    },
+    ...localizedEntries("home", "monthly", 1, 0.8),
+    ...localizedEntries("guide", "yearly", 0.7, 0.6),
+    ...localizedEntries("hosts", "monthly", 0.6, 0.5),
   ];
 }

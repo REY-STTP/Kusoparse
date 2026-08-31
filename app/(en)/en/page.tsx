@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
-import LocalizedHome from "@/components/LocalizedHome";
+import HomeClient from "@/components/HomeClient";
+import StructuredData from "@/components/StructuredData";
 import { getLocalizedMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = getLocalizedMetadata("en");
 
 export default function EnglishHomePage() {
-  return <LocalizedHome locale="en" />;
+  return (
+    <>
+      <StructuredData locale="en" />
+      <HomeClient />
+    </>
+  );
 }
