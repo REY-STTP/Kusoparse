@@ -36,6 +36,10 @@ The parser recognizes ${DIRECT_HOST_COUNT} direct download hosts and ${INTERMEDI
 - Treat parsed information as source-derived and verify it at the original article.
 - Use the service only for content and purposes you are authorized to access.
 
+## Frequently asked questions
+
+FAQ is available as JSON-LD FAQPage on every page. For full Q&A see ${absoluteUrl("/llms-full.txt")}.
+
 ## Public pages
 
 ${link("Home (Bahasa Indonesia)", localizedPath("id"))}

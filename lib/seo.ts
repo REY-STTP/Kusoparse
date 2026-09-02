@@ -106,6 +106,9 @@ export function getLayoutMetadata(locale: Locale): Metadata {
       ],
       apple: "/apple-icon.png",
     },
+    other: {
+      "llms-txt": "/llms.txt",
+    },
   };
 }
 

@@ -81,7 +81,7 @@ const id = {
     switcher: "Pilih bahasa",
   },
   seo: {
-    metaTitle: "Parser URL Kusonime: Metadata Anime dan Link Download",
+    metaTitle: "KUSOPARSE — Parser URL Kusonime: Metadata Anime dan Link Download",
     description:
       "KUSOPARSE adalah parser URL Kusonime untuk mengambil metadata anime, sinopsis, informasi episode, dan link download dari halaman artikel.",
     eyebrow: "Tentang KUSOPARSE",
@@ -246,7 +246,7 @@ const en: Dictionary = {
     switcher: "Select language",
   },
   seo: {
-    metaTitle: "Kusonime URL Parser: Anime Metadata and Download Links",
+    metaTitle: "KUSOPARSE — Kusonime URL Parser: Anime Metadata and Download Links",
     description:
       "KUSOPARSE is a Kusonime URL parser that extracts anime metadata, synopsis, episode information, and links from an article page.",
     eyebrow: "About KUSOPARSE",
@@ -409,7 +409,7 @@ const ja: Dictionary = {
     switcher: "言語を選択",
   },
   seo: {
-    metaTitle: "Kusonime URL解析: アニメ情報とダウンロードリンク",
+    metaTitle: "KUSOPARSE — Kusonime URL解析: アニメ情報とダウンロードリンク",
     description:
       "KUSOPARSEは、記事URLからアニメのメタデータ、あらすじ、エピソード情報、利用可能なリンクを取得するKusonime解析ツールです。",
     eyebrow: "KUSOPARSEについて",

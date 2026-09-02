@@ -13,6 +13,7 @@ function localizedEntries(
     url: absoluteUrl(pagePath(locale, page)),
     changeFrequency,
     priority: locale === "id" ? idPriority : otherPriority,
+    lastModified: new Date(),
     alternates: { languages: getLanguageAlternates(page) },
   }));
 }

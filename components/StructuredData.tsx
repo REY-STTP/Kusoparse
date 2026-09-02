@@ -48,6 +48,7 @@ export default function StructuredData({
         "@id": `${SITE_URL}/#website`,
         url: SITE_URL,
         name: SITE_NAME,
+        alternateName: ["Kusoparse", "Kusoparse Parser"],
         description: content.description,
         publisher: { "@id": `${SITE_URL}/#organization` },
         inLanguage: ["id-ID", "en", "ja"],
@@ -73,6 +74,10 @@ export default function StructuredData({
         description: pageDescription,
         isPartOf: { "@id": `${SITE_URL}/#website` },
         inLanguage: locale === "id" ? "id-ID" : locale,
+        speakable: {
+          "@type": "SpeakableSpecification",
+          cssSelector: ["#about", "#faq", "#how-to"],
+        },
         ...(page === "home"
           ? { mainEntity: { "@id": `${SITE_URL}/#application` } }
           : {

@@ -17,6 +17,9 @@ export default function EnglishRootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="alternate" type="text/plain" title="LLMs" href="/llms.txt" />
+      </head>
       <body className={`${zenKaku.variable} ${jbMono.variable}`}>
         <LocaleProvider initialLocale="en">
           <SkipLink />
