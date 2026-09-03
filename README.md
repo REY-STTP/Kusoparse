@@ -29,7 +29,7 @@ Dibangun dengan Next.js App Router, bergaya risograph print / neo-brutalist, dan
 - **Fakta kutipabel (GEO)** — jumlah host konsisten di seluruh situs: 12 host download langsung + 3 resolver shortlink (`lib/hosts.ts` sebagai sumber tunggal).
 - **Discovery** — `sitemap.xml` (9 URL + alternate languages), `robots.txt`, `manifest.webmanifest`, `llms.txt` (ringkasan + tautan markdown), dan `llms-full.txt` (konten lengkap: fitur, langkah, FAQ, batasan, daftar host) untuk agen AI/LLM.
 - **Rendering statis** — seluruh halaman konten `○ Static` (prerender, disajikan dari CDN edge); hanya catch-all 404 dan API yang dinamis.
-- **Verifikasi** — meta tag Google Search Console (`verification.google` di metadata layout tiap locale).
+- **Verifikasi** — meta tag Google Search Console (`verification.google`) dan Bing Webmaster Tools (`msvalidate.01`) di metadata layout tiap locale.
 
 ### Keamanan
 
@@ -43,8 +43,8 @@ Dibangun dengan Next.js App Router, bergaya risograph print / neo-brutalist, dan
 
 | Lapisan | Teknologi |
 | --- | --- |
-| Framework | Next.js 16 (App Router, Turbopack, `proxy.ts`) |
-| Bahasa | TypeScript |
+| Framework | Next.js 16.3 (App Router, Turbopack, `proxy.ts`) |
+| Bahasa | TypeScript 5, React 18 |
 | UI | Tailwind CSS 3, Framer Motion, lucide-react |
 | Parsing | cheerio |
 | Lint | ESLint 9 (flat config, `eslint-config-next`) |
@@ -112,8 +112,8 @@ components/
   LocaleSwitcher.tsx        # Toggle ID / EN / JP dengan path per-locale
   SkipLink.tsx              # Skip-to-content link
 lib/
-  site.ts                   # SITE_URL + absoluteUrl + verifikasi GSC
-  seo.ts                    # Metadata localized, canonical, hreflang, path per-halaman
+  site.ts                   # SITE_URL + absoluteUrl + verifikasi GSC & Bing
+  seo.ts                    # Metadata localized, canonical, hreflang, social image, verifikasi
   hosts.ts                  # Sumber tunggal daftar host (12 direct + 3 resolver)
   fonts.ts                  # Font bersama untuk semua root layout
   urls.ts                   # Validasi URL Kusonime + normalisasi http(s)

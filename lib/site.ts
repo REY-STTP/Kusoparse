@@ -23,6 +23,10 @@ export const SITE_DESCRIPTION =
 export const GOOGLE_SITE_VERIFICATION =
   "LKO88BruVcnQmYN33rV5V-vD97Ep9hrhSKUdHGsilMs";
 
+// Bing Webmaster Tools verification token for the site.
+export const BING_SITE_VERIFICATION =
+  "251DD7C241139056B7F36D7E05ABA7E2";
+
 export function absoluteUrl(path = "/") {
   return new URL(path, `${SITE_URL}/`).toString();
 }

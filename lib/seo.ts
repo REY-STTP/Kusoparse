@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { dictionaries, type Locale } from "@/lib/i18n/dictionaries";
 import {
   absoluteUrl,
+  BING_SITE_VERIFICATION,
   GOOGLE_SITE_VERIFICATION,
   SITE_NAME,
   SITE_URL,
@@ -87,6 +88,9 @@ export function getLayoutMetadata(locale: Locale): Metadata {
     referrer: "strict-origin-when-cross-origin",
     verification: {
       google: GOOGLE_SITE_VERIFICATION,
+      other: {
+        "msvalidate.01": BING_SITE_VERIFICATION,
+      },
     },
     robots: {
       index: true,
