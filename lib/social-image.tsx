@@ -48,15 +48,11 @@ export function createSocialImage(locale: Locale, dark = false) {
   const ink = dark ? "#fcfaf2" : "#171410";
   const paper = dark ? "#1f1b16" : "#fcfaf2";
   const accent = "#d63f1e";
-  const muted = dark ? "rgba(252,250,242,0.5)" : "rgba(23,20,16,0.5)";
+  const muted = dark ? "rgba(252,250,242,0.55)" : "rgba(23,20,16,0.55)";
 
-  // Conservative sizing that fits 1200×630 with breathing room.
-  const leadSize = isJa ? 76 : 88;
+  // Satori-friendly sizing — fits 1200×630 with breathing room.
+  const leadSize = isJa ? 76 : 92;
   const markSize = isJa ? 60 : 72;
-
-  // Satori-friendly: avoid position:absolute, mixBlendMode, WebkitTextStroke.
-  // Render hard-shadow by stacking two boxes with offset.
-  // Render watermark as plain text in the background layer of the flex tree.
 
   return new ImageResponse(
     <div
@@ -104,29 +100,56 @@ export function createSocialImage(locale: Locale, dark = false) {
         </span>
       </div>
 
-      {/* Main content + watermark in flex column.
-          Watermark sits as a non-positioned block in the document flow. */}
+      {/* Main content — single column, vertical layout */}
       <div
         style={{
           display: "flex",
-          flexDirection: "row",
+          flexDirection: "column",
+          justifyContent: "space-between",
           flex: 1,
-          width: "100%",
-          position: "relative",
+          padding: "56px 64px",
         }}
       >
-        {/* Left content column */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-            flex: 1,
-            padding: "48px 64px",
-          }}
-        >
-          {/* Lead block */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+        {/* Lead block */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
+          <div
+            style={{
+              display: "flex",
+              fontSize: leadSize,
+              fontWeight: 900,
+              letterSpacing: -2,
+              lineHeight: 1,
+              textTransform: isJa ? "none" : "uppercase",
+            }}
+          >
+            {copy.leadPrefix}
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 28,
+            }}
+          >
+            {/* Accent block with hard border */}
+            <div
+              style={{
+                display: "flex",
+                background: accent,
+                color: paper,
+                padding: "10px 28px",
+                fontSize: markSize,
+                fontWeight: 900,
+                letterSpacing: -2,
+                lineHeight: 1,
+                textTransform: isJa ? "none" : "uppercase",
+                border: `4px solid ${ink}`,
+              }}
+            >
+              {copy.leadAccent}
+            </div>
+
             <div
               style={{
                 display: "flex",
@@ -137,158 +160,47 @@ export function createSocialImage(locale: Locale, dark = false) {
                 textTransform: isJa ? "none" : "uppercase",
               }}
             >
-              {copy.leadPrefix}
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 24,
-              }}
-            >
-              {/* Accent block — hard-shadow simulated by two stacked boxes */}
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    background: accent,
-                    color: paper,
-                    padding: "10px 28px",
-                    fontSize: markSize,
-                    fontWeight: 900,
-                    letterSpacing: -2,
-                    lineHeight: 1,
-                    textTransform: isJa ? "none" : "uppercase",
-                    border: `4px solid ${ink}`,
-                  }}
-                >
-                  {copy.leadAccent}
-                </div>
-              </div>
-
-              <div
-                style={{
-                  display: "flex",
-                  fontSize: leadSize,
-                  fontWeight: 900,
-                  letterSpacing: -2,
-                  lineHeight: 1,
-                  textTransform: isJa ? "none" : "uppercase",
-                }}
-              >
-                {copy.leadSuffix}
-              </div>
-            </div>
-          </div>
-
-          {/* Description card — hard-bordered */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-start",
-              marginTop: 32,
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 16,
-                background: paper,
-                border: `4px solid ${ink}`,
-                padding: "16px 24px",
-                maxWidth: 780,
-              }}
-            >
-              <span
-                style={{
-                  display: "flex",
-                  width: 16,
-                  height: 16,
-                  background: accent,
-                  flexShrink: 0,
-                }}
-              />
-              <span
-                style={{
-                  display: "flex",
-                  fontSize: 24,
-                  fontWeight: 500,
-                  color: ink,
-                  lineHeight: 1.35,
-                }}
-              >
-                {copy.description}
-              </span>
+              {copy.leadSuffix}
             </div>
           </div>
         </div>
 
-        {/* Right column — watermark + footer row stacked vertically */}
+        {/* Description card — hard-bordered */}
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
-            alignItems: "flex-end",
-            justifyContent: "space-between",
-            padding: "48px 64px 32px 0",
-            width: 360,
-            flexShrink: 0,
+            alignItems: "center",
+            gap: 16,
+            background: paper,
+            border: `4px solid ${ink}`,
+            padding: "16px 24px",
+            maxWidth: 880,
           }}
         >
-          {/* Watermark "KUSO" — plain text, no outline stroke.
-              Renders as solid muted color so satori can paint it. */}
-          <div
+          <span
             style={{
               display: "flex",
-              fontSize: 180,
-              fontWeight: 900,
-              letterSpacing: -4,
-              lineHeight: 1,
-              color: muted,
-              textTransform: "uppercase",
-              marginTop: 40,
+              width: 16,
+              height: 16,
+              background: accent,
+              flexShrink: 0,
             }}
-          >
-            KUSO
-          </div>
-
-          {/* OPEN SOURCE badge */}
-          <div
+          />
+          <span
             style={{
               display: "flex",
-              alignItems: "center",
-              gap: 12,
-              fontSize: 18,
-              fontWeight: 700,
-              letterSpacing: 4,
-              textTransform: "uppercase",
-              fontFamily: "Courier New",
-              color: muted,
+              fontSize: 24,
+              fontWeight: 500,
+              color: ink,
+              lineHeight: 1.35,
             }}
           >
-            <span
-              style={{
-                display: "flex",
-                width: 14,
-                height: 14,
-                background: accent,
-              }}
-            />
-            <span style={{ display: "flex" }}>OPEN SOURCE</span>
-          </div>
+            {copy.description}
+          </span>
         </div>
       </div>
 
-      {/* Footer row — spans full width at bottom */}
+      {/* Footer row — full width with URL + OPEN SOURCE badge */}
       <div
         style={{
           display: "flex",
@@ -305,6 +217,17 @@ export function createSocialImage(locale: Locale, dark = false) {
         }}
       >
         <span style={{ display: "flex" }}>{copy.footer}</span>
+        <span style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <span
+            style={{
+              display: "flex",
+              width: 14,
+              height: 14,
+              background: accent,
+            }}
+          />
+          <span style={{ display: "flex" }}>OPEN SOURCE</span>
+        </span>
       </div>
     </div>,
     SOCIAL_IMAGE_SIZE,
