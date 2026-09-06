@@ -66,6 +66,7 @@ export default function StructuredData({
         offers: {
           "@type": "Offer",
           price: 0,
+          priceCurrency: "IDR",
         },
         featureList: content.features.map((feature) => feature.title),
         provider: { "@id": `${SITE_URL}/#organization` },
