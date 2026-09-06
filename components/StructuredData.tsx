@@ -63,6 +63,10 @@ export default function StructuredData({
         operatingSystem: "Any",
         browserRequirements: "Requires a modern web browser with JavaScript enabled.",
         isAccessibleForFree: true,
+        offers: {
+          "@type": "Offer",
+          price: 0,
+        },
         featureList: content.features.map((feature) => feature.title),
         provider: { "@id": `${SITE_URL}/#organization` },
       },

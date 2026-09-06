@@ -8,6 +8,10 @@ const nextConfig = {
     ];
   },
   images: {
+    // Disengaja terbuka: cover anime berasal dari hasil scrape artikel
+    // Kusonime (og:image / .post-thumb) yang host-nya arbitrer dan baru
+    // diketahui saat runtime. Allowlist statis akan merusak gambar.
+    // Jika suatu saat cover di-proxy sendiri, ganti dengan allowlist eksplisit.
     remotePatterns: [
       {
         protocol: "https",

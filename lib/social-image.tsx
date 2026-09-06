@@ -1,7 +1,9 @@
 import { ImageResponse } from "next/og";
-import type { Locale } from "@/lib/i18n/dictionaries";
+import { dictionaries, type Locale } from "@/lib/i18n/dictionaries";
 
 export const SOCIAL_IMAGE_SIZE = { width: 1200, height: 630 } as const;
+
+export type SocialPage = "home" | "guide" | "hosts";
 
 type SocialCopy = {
   eyebrow: string;
@@ -39,8 +41,37 @@ const COPY: Record<Locale, SocialCopy> = {
   },
 };
 
-export function createSocialImage(locale: Locale, dark = false) {
-  const copy = COPY[locale];
+// Lead pendek untuk OG halaman guide/hosts (layout 3 bagian sama seperti home).
+// Description diambil dari dictionaries (sumber tunggal) di createSocialImage.
+const PAGE_LEAD: Record<
+  Exclude<SocialPage, "home">,
+  Record<Locale, Pick<SocialCopy, "leadPrefix" | "leadAccent" | "leadSuffix">>
+> = {
+  guide: {
+    id: { leadPrefix: "PANDUAN", leadAccent: "CARA", leadSuffix: "PAKAI" },
+    en: { leadPrefix: "GUIDE", leadAccent: "HOW", leadSuffix: "TO USE" },
+    ja: { leadPrefix: "KUSOPARSE", leadAccent: "使い方", leadSuffix: "ガイド" },
+  },
+  hosts: {
+    id: { leadPrefix: "DAFTAR", leadAccent: "HOST", leadSuffix: "RESMI" },
+    en: { leadPrefix: "SUPPORTED", leadAccent: "HOSTS", leadSuffix: "LIST" },
+    ja: { leadPrefix: "対応", leadAccent: "ホスト", leadSuffix: "一覧" },
+  },
+};
+
+export function createSocialImage(locale: Locale, dark = false, page: SocialPage = "home") {
+  const base = COPY[locale];
+  const seo = dictionaries[locale].seo;
+  // Home memakai COPY apa adanya (nol risiko regresi visual OG yang sudah jalan).
+  // Guide/hosts memakai lead ringkas + description dari dictionaries (sumber tunggal).
+  const copy: SocialCopy =
+    page === "home"
+      ? base
+      : {
+          ...base,
+          ...PAGE_LEAD[page][locale],
+          description: page === "guide" ? seo.guideDescription : seo.hostsDescription,
+        };
   const isJa = locale === "ja";
 
   // Brand tokens — mirror tailwind.config.ts kuso-* palette

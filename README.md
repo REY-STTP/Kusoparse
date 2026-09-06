@@ -10,7 +10,7 @@ Dibangun dengan Next.js App Router, bergaya risograph print / neo-brutalist, dan
 
 - **Parsing instan** — ekstrak judul, thumbnail, info (genre, status, score, dst.), sinopsis, dan semua link download dari halaman Kusonime.
 - **Resolve shortlink** — membuka shortlink host (shrinkearn, tpi.li, justpaste.it, dst.) langsung ke link download aslinya.
-- **State lengkap** — skeleton loader saat parsing, error state yang jelas, empty state "cara pakai", halaman 404 kustom.
+- **State lengkap** — skeleton loader saat parsing, error state yang jelas, area hasil kosong saat idle, halaman 404 kustom.
 - **Aksesibilitas** — skip-link, `focus-visible`, `aria` attributes, dukungan `prefers-reduced-motion`.
 
 ### Multibahasa
@@ -27,7 +27,7 @@ Dibangun dengan Next.js App Router, bergaya risograph print / neo-brutalist, dan
 - **Structured data** — JSON-LD `Organization`, `WebSite`, `WebApplication`, `WebPage`, `HowTo`, `FAQPage`, `BreadcrumbList`, dan `ItemList` (daftar 15 host di halaman hosts).
 - **Konten semantik** — FAQ, cara penggunaan, fitur, batasan layanan, dan daftar host ter-render di HTML (SSR statis), bukan hanya di schema.
 - **Fakta kutipabel (GEO)** — jumlah host konsisten di seluruh situs: 12 host download langsung + 3 resolver shortlink (`lib/hosts.ts` sebagai sumber tunggal).
-- **Discovery** — `sitemap.xml` (9 URL + alternate languages), `robots.txt`, `manifest.webmanifest`, `llms.txt` (ringkasan + tautan markdown), dan `llms-full.txt` (konten lengkap: fitur, langkah, FAQ, batasan, daftar host) untuk agen AI/LLM.
+- **Discovery** — `sitemap.xml` (11 URL: 9 halaman + llms.txt/llms-full.txt, alternate languages, lastmod dinamis git → mtime → fallback), `robots.txt`, `manifest.webmanifest`, `llms.txt` (ringkasan + tautan markdown), dan `llms-full.txt` (konten lengkap: fitur, langkah, FAQ, batasan, daftar host) untuk agen AI/LLM.
 - **Rendering statis** — seluruh halaman konten `○ Static` (prerender, disajikan dari CDN edge); hanya catch-all 404 dan API yang dinamis.
 - **Verifikasi** — meta tag Google Search Console (`verification.google`) dan Bing Webmaster Tools (`msvalidate.01`) di metadata layout tiap locale.
 
@@ -76,10 +76,12 @@ app/
   (id)/                     # Route group Bahasa Indonesia (root layout sendiri)
     layout.tsx              # <html lang="id-ID">, font, metadata, LocaleProvider
     page.tsx                # Halaman utama (/)
-    panduan/page.tsx        # Panduan + FAQ (/panduan)
+    panduan/page.tsx        # Panduan + FAQ accordion (/panduan)
     hosts/page.tsx          # Daftar host yang didukung (/hosts)
     opengraph-image.tsx     # Social preview (id)
     twitter-image.tsx
+    panduan/opengraph-image.tsx + twitter-image.tsx  # OG panduan (id)
+    hosts/opengraph-image.tsx + twitter-image.tsx    # OG daftar host (id)
     not-found.tsx           # 404 kustom (locale ini)
     [...rest]/page.tsx      # Catch-all -> 404 dengan layout locale
   (en)/                     # Route group English — pola yang sama di bawah /en
@@ -90,11 +92,11 @@ app/
     en/twitter-image.tsx
     not-found.tsx
     en/[...rest]/page.tsx
-  (ja)/                     # Route group 日本語 — pola yang sama di bawah /ja
+  (ja)/                     # Route group 日本語 — pola yang sama di bawah /ja (termasuk OG per halaman)
   api/parse/route.ts        # Endpoint parsing (lang-aware, validasi URL, noindex)
   api/resolve/route.ts      # Endpoint resolve shortlink (allowlist, noindex)
   robots.ts                 # robots.txt
-  sitemap.ts                # sitemap.xml (9 URL + alternate languages)
+  sitemap.ts                # sitemap.xml (11 URL + alternate languages, lastmod dinamis)
   manifest.ts               # manifest.webmanifest (PWA)
   llms.txt/route.ts         # Ringkasan mesin untuk agen AI/LLM (markdown links)
   llms-full.txt/route.ts    # Konten lengkap untuk agen AI/LLM (FAQ, fitur, host)
@@ -102,12 +104,12 @@ app/
   icon.png / apple-icon.png
 components/
   HomeClient.tsx            # Halaman utama (hero, form, hasil, SEO content)
-  GuideClient.tsx           # Halaman panduan
+  GuideClient.tsx           # Halaman panduan (FAQ accordion + animasi, sama seperti beranda)
   HostsContent.tsx          # Halaman daftar host (server component)
   NotFoundContent.tsx       # 404 kustom (dipakai semua group)
   UrlForm.tsx               # Form input URL + validasi
   AnimeCard.tsx             # Kartu hasil (info, sinopsis, link, atribusi sumber)
-  SeoContent.tsx            # Konten semantik: fitur, how-to, FAQ
+  SeoContent.tsx            # Konten semantik: fitur, how-to, FAQ accordion (auto-close + animasi)
   StructuredData.tsx        # JSON-LD @graph per halaman (home/guide/hosts)
   LocaleSwitcher.tsx        # Toggle ID / EN / JP dengan path per-locale
   SkipLink.tsx              # Skip-to-content link
@@ -120,7 +122,7 @@ lib/
   http.ts                   # Pembaca response body dengan batas ukuran
   parseKusonime.ts          # Scraper cheerio halaman Kusonime
   resolveLink.ts            # Resolver shortlink (allowlist + SSRF guard)
-  social-image.tsx          # Generator social image per locale
+  social-image.tsx          # Generator social image per locale + varian halaman (home/guide/hosts)
   i18n/                     # dictionaries.ts + LocaleContext.tsx
 hooks/
   useKuso.ts                # State parsing (loading / error / data)

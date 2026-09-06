@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import Link from "next/link";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
 import { useLocale } from "@/lib/i18n/LocaleContext";
@@ -7,6 +8,16 @@ import { hostsPath, localizedPath } from "@/lib/seo";
 
 export default function GuideClient() {
   const { locale, t } = useLocale();
+  const faqRef = useRef<HTMLDivElement>(null);
+
+  // Satu terbuka → yang lain menutup (perilaku accordion, sama seperti beranda).
+  const handleFaqToggle = (event: React.SyntheticEvent<HTMLDetailsElement>) => {
+    const opened = event.currentTarget;
+    if (!opened.open) return;
+    faqRef.current?.querySelectorAll("details[open]").forEach((el) => {
+      if (el !== opened) el.removeAttribute("open");
+    });
+  };
 
   return (
     <main
@@ -105,21 +116,25 @@ export default function GuideClient() {
               <h2 id="faq-title" className="font-display font-bold text-2xl mb-4">
                 {t.seo.faqTitle}
               </h2>
-              <div className="divide-y-[2px] divide-kuso-ink/20 border-y-[2px] border-kuso-ink/20">
+              <div ref={faqRef} className="divide-y-[2px] divide-kuso-ink/20 border-y-[2px] border-kuso-ink/20">
                 {t.seo.faq.map((item) => (
-                  <details key={item.question} className="group py-4">
+                  <details key={item.question} onToggle={handleFaqToggle} className="group py-4">
                     <summary className="cursor-pointer list-none pr-8 font-bold text-sm sm:text-base relative">
                       {item.question}
                       <span
                         aria-hidden="true"
-                        className="absolute right-0 top-0 font-mono text-kuso-accent group-open:rotate-45 transition-transform"
+                        className="absolute right-0 top-0 font-mono text-kuso-accent transition-transform duration-300 ease-out group-open:rotate-45"
                       >
                         +
                       </span>
                     </summary>
-                    <p className="mt-3 text-sm leading-relaxed opacity-75">
-                      {item.answer}
-                    </p>
+                    <div className="faq-answer">
+                      <div>
+                        <p className="mt-3 text-sm leading-relaxed opacity-75">
+                          {item.answer}
+                        </p>
+                      </div>
+                    </div>
                   </details>
                 ))}
               </div>

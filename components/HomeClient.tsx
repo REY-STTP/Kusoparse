@@ -40,35 +40,6 @@ function ParseSkeleton() {
   );
 }
 
-function IdleState() {
-  const { t } = useLocale();
-
-  return (
-    <motion.div
-      key="idle"
-      initial={false}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0 }}
-      className="hard-border shadow-hard-sm bg-kuso-paper max-w-xl mx-auto p-6 rotate-[0.4deg]"
-    >
-      <div className="font-mono text-xs font-bold uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-        <span className="w-2 h-2 bg-kuso-accent" aria-hidden />
-        {t.idle.title}
-      </div>
-      <ol className="space-y-3">
-        {t.idle.steps.map((step, i) => (
-          <li key={i} className="flex gap-3 font-mono text-sm leading-relaxed">
-            <span className="font-bold text-kuso-accent tabular-nums shrink-0">
-              0{i + 1}
-            </span>
-            <span className="opacity-80">{step}</span>
-          </li>
-        ))}
-      </ol>
-    </motion.div>
-  );
-}
-
 export default function HomeClient() {
   const { parseUrl, loading, error, data } = useKuso();
   const { t } = useLocale();
@@ -139,6 +110,7 @@ export default function HomeClient() {
             animate="show"
             className="font-display font-black text-4xl sm:text-6xl md:text-7xl leading-[0.95]"
           >
+            <span className="sr-only">{t.seo.metaTitle} — </span>
             {BRAND_WORD.split("").map((ch, ci) => (
               <motion.span
                 key={ci}
@@ -200,7 +172,7 @@ export default function HomeClient() {
         <section
           aria-live="polite"
           aria-label={t.skeleton.aria}
-          className="mt-12 min-h-[300px]"
+          className="mt-12"
         >
           <AnimatePresence mode="wait">
             {loading && (
@@ -236,8 +208,6 @@ export default function HomeClient() {
             {data && !error && !loading && (
               <AnimeCard key={data.sourceUrl} data={data} />
             )}
-
-            {!data && !error && !loading && <IdleState />}
           </AnimatePresence>
         </section>
 

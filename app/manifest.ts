@@ -10,6 +10,8 @@ export default function manifest(): MetadataRoute.Manifest {
     display: "standalone",
     background_color: "#f2ecdc",
     theme_color: "#f2ecdc",
+    // Default locale (id) — manifest tidak mendukung multi-lang;
+    // locale aktif mengikuti <html lang> tiap route group.
     lang: "id-ID",
     icons: [
       {

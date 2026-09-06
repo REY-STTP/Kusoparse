@@ -51,6 +51,20 @@
   .skip-link:focus-visible {
     @apply translate-y-0;
   }
+
+  /* FAQ buka-tutup halus: animasi grid-rows pada <details> native
+     (SSR-safe — konten jawaban tetap di HTML awal untuk crawler). */
+  .faq-answer {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  details[open] > .faq-answer {
+    grid-template-rows: 1fr;
+  }
+  .faq-answer > div {
+    overflow: hidden;
+  }
 }
 
 @layer utilities {
@@ -75,5 +89,8 @@
   }
   .animate-marquee {
     animation: none;
+  }
+  .faq-answer {
+    transition: none;
   }
 }

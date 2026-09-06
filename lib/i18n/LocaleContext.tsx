@@ -16,8 +16,6 @@ import {
   type Locale,
 } from "./dictionaries";
 
-const STORAGE_KEY = "kusoparse-locale";
-
 interface LocaleContextValue {
   locale: Locale;
   setLocale: (locale: Locale) => void;
@@ -44,8 +42,9 @@ export function LocaleProvider({
   }, [locale]);
 
   const setLocale = useCallback((next: Locale) => {
+    // Route adalah sumber kebenaran locale; tidak disimpan ke storage
+    // agar tidak melawan navigasi (storage write yang lama sudah dihapus).
     setLocaleState(next);
-    window.localStorage.setItem(STORAGE_KEY, next);
   }, []);
 
   return (
